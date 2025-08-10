@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Love Images
+{% endblock title %}
+{% block content %}
+    <!-- Gallery -->
+    <div class="bg-gray-100 pt-20">
+        {% if messages %}
+            <ul class="space-y-2 mb-5">
+                {% for message in messages %}
+                    <li class=" p-4 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% endif %} {% if message.tags == 'error' %}bg-red-100 text-red-800{% endif %} {% if message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% endif %} {% if message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %} ">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <main class="p-6">
+            <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+                {% for img in images %}
+                    <div class="break-inside-avoid bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                        <img src="{{ img.image.url }}"
+                             alt="{{ img.title }}"
+                             class="w-full h-auto object-cover">
+                        <div class="p-4">
+                            <h2 class="text-lg font-semibold text-gray-700">{{ img.title }}</h2>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-gray-500 text-lg">No images uploaded yet.</p>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+{% endblock content %}

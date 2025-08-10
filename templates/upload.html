@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Upload
+{% endblock title %}
+{% block content %}
+    <div class="bg-gray-100 p-40">
+        {% if messages %}
+            <ul class="space-y-2 mb-5">
+                {% for message in messages %}
+                    <li class=" p-4 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% endif %} {% if message.tags == 'error' %}bg-red-100 text-red-800{% endif %} {% if message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% endif %} {% if message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %} ">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="POST"
+              enctype="multipart/form-data"
+              class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-6 m-auto">
+            {% csrf_token %}
+            <h1 class="text-2xl font-bold text-gray-800 text-center">Upload Image</h1>
+            <!-- Title Field -->
+            <div>
+                <label for="title" class="block text-gray-700 font-semibold mb-2">Title</label>
+                <input type="text"
+                       id="title"
+                       name="title"
+                       placeholder="Enter image title"
+                       value="{{ request.POST.title|default:'' }}"
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                       required>
+            </div>
+            <!-- Image Field -->
+            <div>
+                <label for="image" class="block text-gray-700 font-semibold mb-2">Choose Image</label>
+                <input type="file"
+                       id="image"
+                       name="image"
+                       accept="image/*"
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                       required>
+            </div>
+            <!-- Submit Button -->
+            <div>
+                <button type="submit"
+                        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+                    Upload
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
