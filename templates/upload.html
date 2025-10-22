@@ -1,50 +1,65 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}
-    Upload
+    Завантажити зображення
 {% endblock title %}
 {% block content %}
-    <div class="bg-gray-100 p-40">
-        {% if messages %}
-            <ul class="space-y-2 mb-5">
-                {% for message in messages %}
-                    <li class=" p-4 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% endif %} {% if message.tags == 'error' %}bg-red-100 text-red-800{% endif %} {% if message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% endif %} {% if message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %} ">
-                        {{ message }}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+    <!--
+    Контейнер, який займає всю висоту доступного місця (min-h-full)
+    та використовує Flexbox для центрування вмісту.
+    min-h-[calc(100vh-4rem)]: Це гарантує, що контейнер займе решту висоти екрана,
+    враховуючи висоту навігаційної панелі, встановлену в pt-16 (4rem) у base.html.
+    -->
+    <div class="flex items-center justify-center p-4 min-h-[calc(100vh-4rem)]">
+
+        <!-- Обгортка для повідомлень. Розташована трохи вище центру для кращої видимості. -->
+        <div class="w-full max-w-md absolute top-20 mx-auto">
+            {% if messages %}
+                <ul class="space-y-2 mb-5">
+                    {% for message in messages %}
+                        <li class="p-4 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% endif %} {% if message.tags == 'error' %}bg-red-100 text-red-800{% endif %} {% if message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% endif %} {% if message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %}">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Форма завантаження -->
         <form method="POST"
               enctype="multipart/form-data"
-              class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-6 m-auto">
+              class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md space-y-6 my-8 transform transition duration-300 hover:shadow-xl">
             {% csrf_token %}
-            <h1 class="text-2xl font-bold text-gray-800 text-center">Upload Image</h1>
-            <!-- Title Field -->
+            <h1 class="text-3xl font-bold text-blue-600 text-center">Завантажити зображення</h1>
+
+            <!-- Поле назви -->
             <div>
-                <label for="title" class="block text-gray-700 font-semibold mb-2">Title</label>
+                <label for="title" class="block text-gray-700 font-semibold mb-2">Назва</label>
                 <input type="text"
                        id="title"
                        name="title"
-                       placeholder="Enter image title"
+                       placeholder="Введіть назву зображення"
                        value="{{ request.POST.title|default:'' }}"
-                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-4 focus:ring-blue-300 transition duration-150"
                        required>
             </div>
-            <!-- Image Field -->
+
+            <!-- Поле файлу -->
             <div>
-                <label for="image" class="block text-gray-700 font-semibold mb-2">Choose Image</label>
+                <label for="image" class="block text-gray-700 font-semibold mb-2">Виберіть файл</label>
                 <input type="file"
                        id="image"
                        name="image"
                        accept="image/*"
-                       class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                       class="w-full border border-gray-300 rounded-lg py-2 bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                        required>
             </div>
-            <!-- Submit Button -->
+
+            <!-- Кнопка відправки -->
             <div>
                 <button type="submit"
-                        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">
-                    Upload
+                        class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-[1.01]">
+                    Завантажити
                 </button>
             </div>
         </form>

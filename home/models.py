@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from cloudinary.models import CloudinaryField
 
 
 # Create your models here.
@@ -7,5 +7,5 @@ from django.contrib.auth.models import User
 
 class Image(models.Model):
     title = models.CharField(max_length=100)
-    image = models.ImageField(upload_to="user_images")
-    date = models.DateTimeField(auto_now=True)
+    image = CloudinaryField('image')
+    uploaded_at = models.DateTimeField(auto_now=True)

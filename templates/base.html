@@ -10,38 +10,45 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <!-- Оновлення Font Awesome на сучасну версію 6 для сумісності -->
         <link rel="stylesheet"
-              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
-              integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+              xintegrity="sha512-Fo3rlrZj/k7ujTnHg4C+2D7z4v/8t0N+qF8dD+R+A8tA9t+5p5zL9W/6z+d4/O9D3+I+K+4D+E4/Q+2Q=="
               crossorigin="anonymous"
               referrerpolicy="no-referrer" />
     </head>
-    <body>
-        <nav class="flex items-center justify-between p-4 bg-white fixed w-[100%]">
+    <!-- ДОДАНО: клас pt-16 (padding-top) для зміщення всього вмісту під fixed-nav -->
+    <body class="bg-gray-100 pt-16 min-h-screen">
+
+        <!-- Навігаційна панель (з класом fixed) -->
+        <nav class="flex items-center justify-between p-4 bg-white fixed top-0 left-0 w-full z-50 shadow-sm">
             <!-- Logo -->
             <a href="{% url 'index' %}">
                 <div class="flex items-center space-x-2">
-                    <span class="text-lg font-bold text-blue-600">ImageUploader</span>
+                    <span class="text-lg font-bold text-blue-600">Галерея Ідей</span>
                 </div>
             </a>
-            <!-- Search bar -->
+
             <!-- Right side buttons -->
             <div class="flex items-center space-x-4">
                 {% if user.is_authenticated %}
-                    <!-- Show only if logged in -->
-                    <a href="{% url 'upload' %}"
-                       class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">Upload</a>
+                    <!-- Show Upload button ONLY for superusers -->
+                    {% if user.is_superuser %}
+                        <a href="{% url 'upload' %}"
+                           class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition duration-300">Upload</a>
+                    {% endif %}
+
+                    <!-- Logout button for ALL authenticated users -->
                     <a href="{% url 'logout_page' %}"
-                       class="text-gray-700 hover:text-red-500">Logout</a>
-                {% else %}
-                    <!-- Show only if NOT logged in -->
-                    <a href="{% url 'signup' %}" class="text-gray-700 hover:text-blue-500">Sign Up</a>
-                    <a href="{% url 'login_page' %}"
-                       class="text-gray-700 hover:text-blue-500">Login</a>
+                       class="text-gray-700 hover:text-red-500 transition duration-300">Logout</a>
                 {% endif %}
             </div>
         </nav>
-        {% block content %}
-        {% endblock content %}
+
+        <!-- ОСНОВНИЙ КОНТЕНТ (Тепер без mt-16, оскільки він у body) -->
+        <main>
+            {% block content %}
+            {% endblock content %}
+        </main>
     </body>
 </html>
