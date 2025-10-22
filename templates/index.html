@@ -65,16 +65,24 @@
 
 </div>
 
-<!-- МОДАЛЬНЕ ВІКНО (ВИНЕСЕНО ЗА МЕЖІ ВСІХ КОНТЕЙНЕРІВ) -->
 <div id="imageModal" style="display: none;">
   <div id="modalOverlay"></div>
+
+  <button id="closeButton" onclick="closeModal()">&times;</button>
+
+  <div id="zoomControls">
+    <button id="zoomOutButton" onclick="changeZoom(-0.1)" title="Зменшити">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+    <button id="zoomInButton" onclick="changeZoom(0.1)" title="Збільшити">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+  </div>
   <div id="modalContent">
-    <button id="closeButton" onclick="closeModal()">&times;</button>
     <img id="modalImage" src="" alt="">
   </div>
 </div>
 
-<!-- CSS ДЛЯ МОДАЛЬНОГО ВІКНА -->
 <style>
 #imageModal {
   position: fixed;
@@ -100,25 +108,48 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 90vw;
-  max-height: 90vh;
+
+  width: 90vw;
+  height: 90vh;
+
+  /* ДОЗВОЛЯЄМО ПРОКРУТКУ */
+  overflow: auto;
+
   z-index: 10000;
+
+  display: flex;
+  justify-content: center;
+  /* Вміст починається зверху */
+  align-items: flex-start;
+
+  background-color: transparent;
 }
 
+/* ОНОВЛЕНИЙ БЛОК ДЛЯ #modalImage */
 #modalImage {
-  max-width: 100vw;
-  max-height: 100vh;
-  width: 100%; /* Дозволяє зображенню розтягнутися на 100% ширини модального вікна */
-  height: 100%; /* Дозволяє зображенню розтягнутися на 100% висоти модального вікна */
-  object-fit: contain; /* Гарантує, що зображення вміститься повністю, не обрізаючи його, заповнюючи простір width/height */
+  max-width: none;
+  max-height: none;
+
+  width: auto;
+  height: auto;
+  object-fit: contain;
+
   border-radius: 8px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
 
+  transform: scale(1);
+  transition: transform 0.3s ease-in-out;
+
+  /* !!! КЛЮЧОВА ЗМІНА: Масштабування від верхнього лівого кута !!! */
+  transform-origin: 0 0;
+}
+/* КІНЕЦЬ ОНОВЛЕНОГО БЛОКУ */
+
+/* ОНОВЛЕНІ СТИЛІ ДЛЯ КНОПКИ ЗАКРИТТЯ */
 #closeButton {
-  position: absolute;
-  top: -15px;
-  right: -15px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
   width: 50px;
   height: 50px;
   background-color: #ef4444;
@@ -133,13 +164,48 @@
   justify-content: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   transition: background-color 0.2s;
-  z-index: 10001;
+  z-index: 10002;
   line-height: 1;
 }
 
 #closeButton:hover {
   background-color: #dc2626;
 }
+
+/* ОНОВЛЕНІ СТИЛІ ДЛЯ КНОПОК ЗУМУ */
+#zoomControls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10002;
+  display: flex;
+  gap: 10px;
+}
+
+#zoomControls button {
+  width: 50px;
+  height: 50px;
+  background-color: #3b82f6; /* Blue-500 */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s, transform 0.2s;
+  line-height: 1;
+}
+
+#zoomControls button:hover {
+  background-color: #2563eb; /* Blue-600 */
+  transform: scale(1.05);
+}
+
 
 /* Анімація появи */
 #imageModal.show {
@@ -156,14 +222,62 @@
 }
 </style>
 
-<!-- СКРИПТИ -->
 <script>
+// Глобальна змінна для відстеження поточного масштабу
+let currentZoom = 1.0;
+const MAX_ZOOM = 3.0;
+const MIN_ZOOM = 1.0;
+
+function changeZoom(delta) {
+  const modalImage = document.getElementById('modalImage');
+  const modalContent = document.getElementById('modalContent');
+  if (!modalImage || !modalContent) return;
+
+  let newZoom = currentZoom + delta;
+
+  if (newZoom < MIN_ZOOM) {
+    newZoom = MIN_ZOOM;
+  } else if (newZoom > MAX_ZOOM) {
+    newZoom = MAX_ZOOM;
+  }
+
+  // Застосовуємо новий масштаб
+  modalImage.style.transform = `scale(${newZoom})`;
+  currentZoom = newZoom;
+
+  // --- ЛОГІКА ПРОКРУТКИ ---
+  if (currentZoom > 1.0) {
+    // 1. Горизонтальне прокручування (по центру)
+    // Розраховуємо горизонтальне зміщення, щоб зображення було по центру
+    const scaledWidth = modalImage.offsetWidth * newZoom;
+    const scrollHorizontal = (scaledWidth - modalContent.clientWidth) / 2;
+    modalContent.scrollLeft = scrollHorizontal > 0 ? scrollHorizontal : 0;
+
+    // 2. Вертикальне прокручування
+    // Встановлюємо вертикальну прокрутку в нуль (верхній край),
+    // оскільки transform-origin: 0 0 вже зафіксував верхній край
+    modalContent.scrollTop = 0;
+
+  } else {
+    // Якщо мінімальний масштаб, скидаємо прокрутку
+    modalContent.scrollLeft = 0;
+    modalContent.scrollTop = 0;
+  }
+}
+
 function openModal(imageUrl, imageTitle) {
   console.log("openModal викликано з URL: ", imageUrl);
 
   const modal = document.getElementById('imageModal');
   const modalImage = document.getElementById('modalImage');
   const overlay = document.getElementById('modalOverlay');
+
+  // Скидаємо масштаб та прокрутку при відкритті
+  currentZoom = 1.0;
+  modalImage.style.transform = `scale(${currentZoom})`;
+  const modalContent = document.getElementById('modalContent');
+  modalContent.scrollLeft = 0;
+  modalContent.scrollTop = 0;
 
   // Встановлюємо зображення
   modalImage.src = imageUrl;
@@ -173,7 +287,8 @@ function openModal(imageUrl, imageTitle) {
   modal.style.display = 'block';
   modal.classList.add('show');
 
-  // Блокуємо прокрутку body
+
+ // Блокуємо прокрутку body
   document.body.style.overflow = 'hidden';
 
   // Закриття при кліку на overlay
@@ -188,10 +303,19 @@ function closeModal() {
   console.log("closeModal викликано.");
 
   const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
 
   // Ховаємо модальне вікно
   modal.style.display = 'none';
   modal.classList.remove('show');
+
+  // Скидаємо масштаб та прокрутку при закритті
+  modalImage.style.transform = 'scale(1)';
+  currentZoom = 1.0;
+  const modalContent = document.getElementById('modalContent');
+  modalContent.scrollLeft = 0;
+  modalContent.scrollTop = 0;
+
 
   // Відновлюємо прокрутку body
   document.body.style.overflow = '';
