@@ -17,33 +17,79 @@
               crossorigin="anonymous"
               referrerpolicy="no-referrer" />
     </head>
-    <!-- ДОДАНО: клас pt-16 (padding-top) для зміщення всього вмісту під fixed-nav -->
-    <body class="bg-gray-100 pt-16 min-h-screen">
+    <style>
+        body {
+    background-color: #181818; /* Темний фон */
+    color: white;
+}
 
-        <!-- Навігаційна панель (з класом fixed) -->
-        <nav class="flex items-center justify-between p-4 bg-white fixed top-0 left-0 w-full z-50 shadow-sm">
+.bg-gray-800 {
+    background-color: #2d2d2d; /* Темно-сірий фон */
+}
+
+.text-white {
+    color: white;
+}
+
+.bg-gray-700 {
+    background-color: #3c3c3c; /* Темніший сірий фон для кнопок */
+}
+
+.text-gray-300 {
+    color: #d1d5db; /* Світло-сірий текст */
+}
+
+.bg-blue-400 {
+    background-color: #60a5fa; /* Світло-синій для кнопок */
+}
+
+.bg-blue-500 {
+    background-color: #3b82f6; /* Синій для активних елементів */
+}
+
+.bg-blue-600 {
+    background-color: #2563eb; /* Темніший синій для hover */
+}
+
+.bg-red-500 {
+    background-color: #ef4444; /* Червоний для помилок */
+}
+
+.bg-green-800 {
+    background-color: #065f46; /* Темно-зелений для успіху */
+}
+
+.bg-yellow-800 {
+    background-color: #b45309; /* Темно-жовтий для попереджень */
+}
+
+.bg-blue-800 {
+    background-color: #1e40af; /* Темно-синій для інформаційних повідомлень */
+}
+
+    </style>
+    <!-- ДОДАНО: клас pt-16 (padding-top) для зміщення всього вмісту під fixed-nav -->
+    <body class="bg-gray-900 text-white pt-16 min-h-screen">
+        <nav class="flex items-center justify-between p-4 bg-gray-800 fixed top-0 left-0 w-full z-50 shadow-sm">
             <!-- Logo -->
             <a href="{% url 'index' %}">
                 <div class="flex items-center space-x-2">
-                    <span class="text-lg font-bold text-blue-600">Галерея Ідей</span>
+                    <span class="text-lg font-bold text-blue-400">Галерея Ідей</span>
                 </div>
             </a>
 
-            <!-- Right side buttons -->
             <div class="flex items-center space-x-4">
                 {% if user.is_authenticated %}
-                    <!-- Show Upload button ONLY for superusers -->
                     {% if user.is_superuser %}
                         <a href="{% url 'upload' %}"
                            class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition duration-300">Upload</a>
                     {% endif %}
-
-                    <!-- Logout button for ALL authenticated users -->
                     <a href="{% url 'logout_page' %}"
-                       class="text-gray-700 hover:text-red-500 transition duration-300">Logout</a>
+                       class="text-gray-300 hover:text-red-500 transition duration-300">Logout</a>
                 {% endif %}
             </div>
         </nav>
+
 
         <!-- ОСНОВНИЙ КОНТЕНТ (Тепер без mt-16, оскільки він у body) -->
         <main>
