@@ -56,7 +56,7 @@
     </main>
 </div>
 
-
+{% if is_desktop %}
 <div id="imageModal" style="display: none;">
   <div id="modalOverlay"></div>
 
@@ -324,7 +324,9 @@ document.addEventListener('keydown', function(event) {
     }
   }
 });
-
+</script>
+{% endif %}
+<script>
 function forceDownload(url, filename) {
   const finalUrl = url.includes('?') ? `${url}&fl_attachment` : `${url}?fl_attachment`;
 

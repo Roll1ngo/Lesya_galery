@@ -10,7 +10,14 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 def index(request):
     images = Image.objects.all().order_by("-id")
-    context = {"images": images}
+
+    user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+    # Достатньо проста перевірка для мобільних пристроїв
+    is_mobile = any(
+        keyword in user_agent for keyword in ['android', 'iphone', 'ipad', 'ipod', 'mobile', 'windows phone'])
+    is_desktop = not is_mobile
+    context = {"images": images,
+               'is_desktop': is_desktop,}
     return render(request, "index.html", context)
 
 
