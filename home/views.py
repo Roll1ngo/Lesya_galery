@@ -1,4 +1,5 @@
 import cloudinary
+from django.http import FileResponse, Http404
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from .models import Image
 from django.contrib.auth.models import User
@@ -113,3 +114,31 @@ def delete_image(request, image_id):
         messages.error(request, f"Виникла непередбачена помилка: {e}")
 
     return redirect('index')
+
+
+def download_image(request, image_id):
+    # 1. Отримуємо об'єкт зображення
+    image_obj = get_object_or_404(Image, id=image_id)
+
+    # 2. Отримуємо шлях до файлу
+    file_path = image_obj.image.path
+
+    # 3. Визначаємо ім'я файлу, яке має бути на клієнті
+    # Використовуємо ім'я з параметрів, якщо воно є (для зручності)
+    client_filename = request.GET.get('filename')
+    if not client_filename:
+        # Якщо ім'я не передано, використовуємо назву зображення
+        client_filename = f"{image_obj.title}.jpg"
+
+    # 4. Створюємо відповідь FileResponse
+    try:
+        response = FileResponse(open(file_path, 'rb'))
+    except FileNotFoundError:
+        raise Http404("Файл не знайдено.")
+
+    # 5. ВСТАНОВЛЕННЯ ЗАГОЛОВКА, ЩО ПРИМУСОВО ВИКЛИКАЄ ВІКНО ЗБЕРЕЖЕННЯ
+    # Це КЛЮЧОВИЙ момент для коректної роботи на ПК та Android
+    response['Content-Type'] = 'application/octet-stream'  # Загальний тип для завантаження
+    response['Content-Disposition'] = f'attachment; filename="{client_filename}"'
+
+    return response

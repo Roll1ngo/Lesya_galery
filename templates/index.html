@@ -37,7 +37,8 @@
                             </svg>
                         </a>
                         {% endif %}
-                        <a href="#" onclick="forceDownload('{{ img.image.url }}', '{{ img.title|slugify }}.jpg'); return false;"
+                        <a href="{{ download_url }}?filename={{ img.title|slugify }}.jpg"
+                           download="{{ img.title|slugify }}.jpg"
                            title="Завантажити {{ img.title }}"
                            class="p-1 bg-gray-700 text-gray-300 rounded-md shadow-md border border-gray-500 hover:bg-gray-600 hover:text-blue-400 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 flex-shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -326,36 +327,44 @@ document.addEventListener('keydown', function(event) {
 });
 </script>
 {% endif %}
-<script>
-function forceDownload(url, filename) {
-  const finalUrl = url.includes('?') ? `${url}&fl_attachment` : `${url}?fl_attachment`;
 
-  fetch(finalUrl)
-    .then(response => {
-      if (!response.ok) {
-        console.error('Download failed: Network response was not ok');
-        alert('Помилка завантаження. Спробуйте пізніше.');
-        return;
-      }
-      return response.blob();
-    })
-    .then(blob => {
-      if (!blob) return;
-      const blobUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(blobUrl);
-      document.body.removeChild(a);
-    })
-    .catch(e => {
-      console.error('Download error:', e);
-      alert('Не вдалося розпочати завантаження. Перевірте консоль.');
-    });
-}
-</script>
+<!--<script>-->
+<!--function forceDownload(url, filename) {-->
+<!--  // 1. Створюємо посилання <a>-->
+<!--  const a = document.createElement('a');-->
+
+<!--  // 2. Встановлюємо URL, додаючи параметр для примусового завантаження (якщо він потрібен на сервері)-->
+<!--  // На деяких бекендах (наприклад, Django) це може бути необхідно.-->
+<!--  const finalUrl = url.includes('?') ? `${url}&fl_attachment=1` : `${url}?fl_attachment=1`;-->
+
+<!--  // Встановлюємо атрибути-->
+<!--  a.href = finalUrl;-->
+<!--  a.download = filename; // Встановлюємо ім'я файлу-->
+<!--  a.style.display = 'none';-->
+
+<!--  // 3. Додаємо до DOM, клікаємо і видаляємо-->
+<!--  document.body.appendChild(a);-->
+
+<!--  try {-->
+<!--      // Спроба програмного кліку-->
+<!--      a.click();-->
+<!--      console.log('Download initiated via a.click()');-->
+<!--  } catch (e) {-->
+<!--      // Якщо a.click() не спрацював (наприклад, на деяких мобільних),-->
+<!--      // ми можемо відкрити його в новому вікні/вкладці, що іноді спрацьовує як завантаження.-->
+<!--      console.error('a.click() failed, attempting window.open:', e);-->
+<!--      window.open(finalUrl, '_blank');-->
+<!--  }-->
+
+<!--  // Затримка перед видаленням, щоб клік мав шанс спрацювати-->
+<!--  setTimeout(() => {-->
+<!--      document.body.removeChild(a);-->
+<!--  }, 100);-->
+
+<!--  // ВАЖЛИВО: Оскільки ми не використовуємо fetch, ми не можемо зловити мережеву помилку-->
+<!--  // тут. Якщо завантаження не розпочалося, це часто пов'язано з дозволами-->
+<!--  // користувача або налаштуваннями браузера.-->
+<!--}-->
+<!--</script>-->
 
 {% endblock content %}
