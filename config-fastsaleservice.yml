@@ -1,0 +1,7 @@
+tunnel: 6bcbbc19-fca1-4999-9c8b-a02035dcaed2
+credentials-file: /home/fastsaleservice/.cloudflared/6bcbbc19-fca1-4999-9c8b-a02035dcaed2.json
+
+ingress:
+  - hostname: fastsalesservice.pp.ua
+    service: http://localhost:8002  # Змініть на порт вашого Django додатку
+  - service: http_status:404
