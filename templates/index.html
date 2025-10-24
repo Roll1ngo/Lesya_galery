@@ -25,9 +25,63 @@
                     <img src="{{ img.image.url }}" alt="{{ img.title }}" class="w-full h-auto object-cover cursor-pointer" onclick="openModal('{{ img.image.url }}', '{{ img.title }}')">
                 </div>
                 <div class="p-4 flex justify-between items-center">
-                    <h2 class="text-lg font-semibold text-gray-300 mr-2">{{ img.title }}</h2>
+                    <!-- ЗАМІНА НАЗВИ НА ІКОНКИ КАТЕГОРІЙ -->
+                    <div class="flex items-center space-x-2 flex-wrap">
+                        {% if img.tags.all %}
+                            {% for tag in img.tags.all %}
+                            <span class="material-symbols-outlined text-blue-400 text-lg" title="{{ tag.name }}">
+                                {{ tag.material_icon }}
+                            </span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-gray-500 text-sm">Без тегів</span>
+                        {% endif %}
+                    </div>
+
                     <div class="flex space-x-2 flex-shrink-0">
                         {% if user.is_superuser %}
+                        <!-- 🌟 КНОПКА "ТЕГИ" -->
+                        <div class="relative inline-block text-left" x-data="{ open: false }" @click.away="open = false">
+                            <button @click="open = !open"
+                                    title="Керування тегами"
+                                    class="fa-solid fa-window-restore text-gray-300 hover:text-blue-400 transition duration-300">
+                            </button>
+
+                            <!-- Випадаючий список тегів -->
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 divide-y divide-gray-600 z-50 origin-top-right max-h-60 overflow-y-auto">
+
+                                <div class="py-1">
+                                    {% for tag in all_tags %}
+                                    {% with tag_id_str=tag.id|stringformat:"s" %}
+                                    <label class="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-600 cursor-pointer transition duration-150 ease-in-out">
+                                        <input type="checkbox"
+                                               class="tag-checkbox form-checkbox h-4 w-4 text-blue-600 bg-gray-800 border-gray-600 rounded mr-3 focus:ring-blue-500"
+                                               data-image-id="{{ img.id }}"
+                                               data-tag-id="{{ tag.id }}"
+                                               {% if tag in img.tags.all %}checked{% endif %}
+                                               onchange="toggleImageTag(this)">
+                                        <!-- Назва тегу з іконкою -->
+                                        <span class="material-symbols-outlined text-blue-400 mr-2 text-sm">
+                                            {{ tag.material_icon }}
+                                        </span>
+                                        {{ tag.name }}
+                                    </label>
+                                    {% endwith %}
+                                    {% empty %}
+                                        <div class="px-4 py-2 text-sm text-gray-400">Теги не знайдено.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 🌟 КІНЕЦЬ БЛОКУ -->
+
                         <a href="{% url 'delete_image' img.id %}"
                            title="Видалити {{ img.title }}"
                            class="p-1 bg-gray-700 text-gray-300 rounded-md shadow-md border border-gray-500 hover:bg-red-600 hover:text-white transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 flex-shrink-0">
@@ -56,25 +110,7 @@
         </div>
     </main>
 </div>
-
-{% if is_desktop %}
-<div id="imageModal" style="display: none;">
-  <div id="modalOverlay"></div>
-
-  <button id="closeButton" onclick="closeModal()">&times;</button>
-
-  <div id="zoomControls">
-    <button id="zoomOutButton" onclick="changeZoom(-0.1)" title="Зменшити">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    </button>
-    <button id="zoomInButton" onclick="changeZoom(0.1)" title="Збільшити">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    </button>
-  </div>
-  <div id="modalContent">
-    <img id="modalImage" src="" alt="">
-  </div>
-</div>
+{% if images %}
 
 <style>
 #imageModal {
@@ -327,44 +363,75 @@ document.addEventListener('keydown', function(event) {
 });
 </script>
 {% endif %}
+<script>
+// 🌟 ФУНКЦІЯ ОБРОБКИ ПЕРЕМИКАННЯ ТЕГІВ
+function toggleImageTag(checkbox) {
+    const imageId = checkbox.dataset.imageId;
+    const tagId = checkbox.dataset.tagId;
+    const isChecked = checkbox.checked;
 
-<!--<script>-->
-<!--function forceDownload(url, filename) {-->
-<!--  // 1. Створюємо посилання <a>-->
-<!--  const a = document.createElement('a');-->
+    // 1. Створюємо об'єкт даних для відправки
+    const data = {
+        image_id: imageId,
+        tag_id: tagId,
+        action: isChecked ? 'add' : 'remove',
+        // Django вимагає CSRF токен для POST/PUT/DELETE запитів
+        csrfmiddlewaretoken: getCookie('csrftoken')
+    };
 
-<!--  // 2. Встановлюємо URL, додаючи параметр для примусового завантаження (якщо він потрібен на сервері)-->
-<!--  // На деяких бекендах (наприклад, Django) це може бути необхідно.-->
-<!--  const finalUrl = url.includes('?') ? `${url}&fl_attachment=1` : `${url}?fl_attachment=1`;-->
+    // 2. Визначаємо URL обробки.
+    // ВИ ПОВИННІ СТВОРИТИ ЦЕЙ URL ВАШОМУ urls.py!
+    const url = '/api/toggle-tag/';
 
-<!--  // Встановлюємо атрибути-->
-<!--  a.href = finalUrl;-->
-<!--  a.download = filename; // Встановлюємо ім'я файлу-->
-<!--  a.style.display = 'none';-->
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': data.csrfmiddlewaretoken
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Якщо сервер повернув помилку (наприклад, 403 Forbidden)
+            throw new Error('Server error: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(result => {
+        console.log('Success:', result);
 
-<!--  // 3. Додаємо до DOM, клікаємо і видаляємо-->
-<!--  document.body.appendChild(a);-->
+        // Оскільки ми не оновлюємо DOM динамічно,
+        // найкраще рішення — це перезавантажити сторінку, щоб відобразити нові теги
+        // window.location.reload();
+    })
+    .catch(error => {
+        console.error('Error toggling tag:', error);
+        // Відкат стану чекбоксу у випадку помилки
+        checkbox.checked = !isChecked;
 
-<!--  try {-->
-<!--      // Спроба програмного кліку-->
-<!--      a.click();-->
-<!--      console.log('Download initiated via a.click()');-->
-<!--  } catch (e) {-->
-<!--      // Якщо a.click() не спрацював (наприклад, на деяких мобільних),-->
-<!--      // ми можемо відкрити його в новому вікні/вкладці, що іноді спрацьовує як завантаження.-->
-<!--      console.error('a.click() failed, attempting window.open:', e);-->
-<!--      window.open(finalUrl, '_blank');-->
-<!--  }-->
+        // Виведення повідомлення про помилку користувачу
+        alert('Помилка під час оновлення тегу: ' + error.message);
+    });
+}
 
-<!--  // Затримка перед видаленням, щоб клік мав шанс спрацювати-->
-<!--  setTimeout(() => {-->
-<!--      document.body.removeChild(a);-->
-<!--  }, 100);-->
+// Допоміжна функція для отримання CSRF токена з кукі
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 
-<!--  // ВАЖЛИВО: Оскільки ми не використовуємо fetch, ми не можемо зловити мережеву помилку-->
-<!--  // тут. Якщо завантаження не розпочалося, це часто пов'язано з дозволами-->
-<!--  // користувача або налаштуваннями браузера.-->
-<!--}-->
-<!--</script>-->
 
 {% endblock content %}

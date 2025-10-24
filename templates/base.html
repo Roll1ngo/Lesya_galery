@@ -10,79 +10,153 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <!-- Оновлення Font Awesome на сучасну версію 6 для сумісності -->
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-              xintegrity="sha512-Fo3rlrZj/k7ujTnHg4C+2D7z4v/8t0N+qF8dD+R+A8tA9t+5p5zL9W/6z+d4/O9D3+I+K+4D+E4/Q+2Q=="
               crossorigin="anonymous"
               referrerpolicy="no-referrer" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     </head>
     <style>
         body {
-    background-color: #181818; /* Темний фон */
-    color: white;
-}
+            background-color: #181818;
+            color: white;
+        }
+        .bg-gray-800 { background-color: #2d2d2d; }
+        .text-white { color: white; }
+        .bg-gray-700 { background-color: #3c3c3c; }
+        .text-gray-300 { color: #d1d5db; }
+        .bg-blue-400 { background-color: #60a5fa; }
+        .bg-blue-500 { background-color: #3b82f6; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-red-500 { background-color: #ef4444; }
+        .bg-green-800 { background-color: #065f46; }
+        .bg-yellow-800 { background-color: #b45309; }
+        .bg-blue-800 { background-color: #1e40af; }
 
-.bg-gray-800 {
-    background-color: #2d2d2d; /* Темно-сірий фон */
-}
-
-.text-white {
-    color: white;
-}
-
-.bg-gray-700 {
-    background-color: #3c3c3c; /* Темніший сірий фон для кнопок */
-}
-
-.text-gray-300 {
-    color: #d1d5db; /* Світло-сірий текст */
-}
-
-.bg-blue-400 {
-    background-color: #60a5fa; /* Світло-синій для кнопок */
-}
-
-.bg-blue-500 {
-    background-color: #3b82f6; /* Синій для активних елементів */
-}
-
-.bg-blue-600 {
-    background-color: #2563eb; /* Темніший синій для hover */
-}
-
-.bg-red-500 {
-    background-color: #ef4444; /* Червоний для помилок */
-}
-
-.bg-green-800 {
-    background-color: #065f46; /* Темно-зелений для успіху */
-}
-
-.bg-yellow-800 {
-    background-color: #b45309; /* Темно-жовтий для попереджень */
-}
-
-.bg-blue-800 {
-    background-color: #1e40af; /* Темно-синій для інформаційних повідомлень */
-}
-
+        /* Стилі для активної кнопки сортування */
+        .sort-active {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
     </style>
-    <!-- ДОДАНО: клас pt-16 (padding-top) для зміщення всього вмісту під fixed-nav -->
     <body class="bg-gray-900 text-white pt-16 min-h-screen">
         <nav class="flex items-center justify-between p-4 bg-gray-800 fixed top-0 left-0 w-full z-50 shadow-sm">
-            <!-- Logo -->
-            <a href="{% url 'index' %}">
-                <div class="flex items-center space-x-2">
-                    <span class="text-lg font-bold text-blue-400">Галерея Ідей</span>
-                </div>
-            </a>
+            <!-- Логотип та сортування -->
+            <div class="flex items-center space-x-4">
+                <!-- Logo -->
+                <a href="{% url 'index' %}">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg font-bold text-blue-400">Галерея Ідей</span>
+                    </div>
+                </a>
 
+                <!-- БЛОК СОРТУВАННЯ -->
+                <div class="flex items-center space-x-2" x-data="{
+                    sortBy: '{{ request.GET.sort|default:'newest' }}',
+                    category: '{{ request.GET.category|default:'all' }}',
+
+                    // Функції для категорій
+                    getCategoryName() {
+                        if (this.category === 'all') return 'Всі категорії';
+                        {% for tag in all_tags %}
+                        if (this.category === '{{ tag.id }}') return '{{ tag.name }}';
+                        {% endfor %}
+                        return 'Категорія';
+                    },
+                    getCategoryIcon() {
+                        if (this.category === 'all') return 'layers';
+                        {% for tag in all_tags %}
+                        if (this.category === '{{ tag.id }}') return '{{ tag.material_icon }}';
+                        {% endfor %}
+                        return 'category';
+                    },
+
+                    // Функції для сортування
+                    getSortIcon() {
+                        if (this.sortBy === 'newest') return 'schedule';
+                        if (this.sortBy === 'oldest') return 'history';
+                        return 'sort';
+                    },
+                    getSortName() {
+                        if (this.sortBy === 'newest') return 'Новіші';
+                        if (this.sortBy === 'oldest') return 'Раніше завантажені';
+                        return 'Сортування';
+                    }
+                }">
+                    <!-- Сортування за часом -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open"
+                                class="flex items-center space-x-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
+                            <!-- ІКОНКА СОРТУВАННЯ -->
+                            <span class="material-symbols-outlined text-lg" x-text="getSortIcon()"></span>
+                            <!-- НАЗВА СОРТУВАННЯ -->
+                            <span x-text="getSortName()"></span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+
+                        <div x-show="open" @click.away="open = false"
+                             class="absolute top-12 left-0 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50">
+                            <a href="?sort=newest&category={{ request.GET.category }}"
+                               class="block px-4 py-3 hover:bg-gray-700 transition duration-200 flex items-center"
+                               :class="sortBy === 'newest' ? 'sort-active text-white' : 'text-gray-300'">
+                                <span class="material-symbols-outlined mr-2">schedule</span>
+                                Новіші
+                            </a>
+                            <a href="?sort=oldest&category={{ request.GET.category }}"
+                               class="block px-4 py-3 hover:bg-gray-700 transition duration-200 flex items-center"
+                               :class="sortBy === 'oldest' ? 'sort-active text-white' : 'text-gray-300'">
+                                <span class="material-symbols-outlined mr-2">history</span>
+                                Раніше завантажені
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Сортування за категоріями -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open"
+                                class="flex items-center space-x-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300">
+                            <!-- ІКОНКА КАТЕГОРІЇ -->
+                            <span class="material-symbols-outlined text-lg" x-text="getCategoryIcon()"></span>
+                            <!-- НАЗВА КАТЕГОРІЇ -->
+                            <span x-text="getCategoryName()"></span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+
+                        <div x-show="open" @click.away="open = false"
+                             class="absolute top-12 left-0 w-56 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 max-h-80 overflow-y-auto">
+                            <a href="?sort={{ request.GET.sort }}&category=all"
+                               class="block px-4 py-3 hover:bg-gray-700 transition duration-200 flex items-center"
+                               :class="category === 'all' ? 'sort-active text-white' : 'text-gray-300'">
+                                <span class="material-symbols-outlined mr-2">layers</span>
+                                Всі категорії
+                            </a>
+                            {% for tag in all_tags %}
+                            <a href="?sort={{ request.GET.sort }}&category={{ tag.id }}"
+                               class="block px-4 py-3 hover:bg-gray-700 transition duration-200 flex items-center"
+                               :class="category === '{{ tag.id }}' ? 'sort-active text-white' : 'text-gray-300'">
+                                <span class="material-symbols-outlined mr-2">{{ tag.material_icon }}</span>
+                                {{ tag.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Права частина навігації -->
             <div class="flex items-center space-x-4">
                 {% if user.is_authenticated %}
                     {% if user.is_superuser %}
                         <a href="{% url 'upload' %}"
-                           class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition duration-300">Upload</a>
+                           class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition duration-300">Завантажити зображення</a>
                     {% endif %}
                     <a href="{% url 'logout_page' %}"
                        class="text-gray-300 hover:text-red-500 transition duration-300">Logout</a>
@@ -90,11 +164,29 @@
             </div>
         </nav>
 
-
-        <!-- ОСНОВНИЙ КОНТЕНТ (Тепер без mt-16, оскільки він у body) -->
         <main>
             {% block content %}
             {% endblock content %}
         </main>
+
+        <script>
+            // Додатковий функціонал для сортування
+            document.addEventListener('DOMContentLoaded', function() {
+                // Збереження стану сортування в localStorage
+                const currentSort = new URLSearchParams(window.location.search).get('sort');
+                const currentCategory = new URLSearchParams(window.location.search).get('category');
+
+                if (currentSort) {
+                    localStorage.setItem('preferredSort', currentSort);
+                }
+                if (currentCategory) {
+                    localStorage.setItem('preferredCategory', currentCategory);
+                }
+
+                // Дебаг інформація
+                console.log('Поточне сортування:', currentSort);
+                console.log('Поточна категорія:', currentCategory);
+            });
+        </script>
     </body>
 </html>

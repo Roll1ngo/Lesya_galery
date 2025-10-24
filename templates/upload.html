@@ -4,15 +4,9 @@
     Завантажити зображення
 {% endblock title %}
 {% block content %}
-    <!--
-    Контейнер, який займає всю висоту доступного місця (min-h-full)
-    та використовує Flexbox для центрування вмісту.
-    min-h-[calc(100vh-4rem)]: Це гарантує, що контейнер займе решту висоти екрана,
-    враховуючи висоту навігаційної панелі, встановлену в pt-16 (4rem) у base.html.
-    -->
     <div class="flex items-center justify-center p-4 min-h-[calc(100vh-4rem)]">
 
-        <!-- Обгортка для повідомлень. Розташована трохи вище центру для кращої видимості. -->
+        <!-- Обгортка для повідомлень -->
         <div class="w-full max-w-md absolute top-20 mx-auto">
             {% if messages %}
                 <ul class="space-y-2 mb-5">
@@ -32,18 +26,6 @@
             {% csrf_token %}
             <h1 class="text-3xl font-bold text-blue-600 text-center">Завантажити зображення</h1>
 
-            <!-- Поле назви -->
-            <div>
-                <label for="title" class="block text-gray-700 font-semibold mb-2">Назва</label>
-                <input type="text"
-                       id="title"
-                       name="title"
-                       placeholder="Введіть назву зображення"
-                       value="{{ request.POST.title|default:'' }}"
-                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-4 focus:ring-blue-300 transition duration-150"
-                       required>
-            </div>
-
             <!-- Поле файлу -->
             <div>
                 <label for="image" class="block text-gray-700 font-semibold mb-2">Виберіть файл</label>
@@ -53,6 +35,30 @@
                        accept="image/*"
                        class="w-full border border-gray-300 rounded-lg py-2 bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                        required>
+            </div>
+
+            <!-- Вибір тегів -->
+            <div>
+                <label class="block text-gray-700 font-semibold mb-3">Оберіть теги</label>
+                <div class="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto p-2 border border-gray-200 rounded-lg">
+                    {% for tag in all_tags %}
+                    <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-300 hover:bg-blue-50 cursor-pointer transition duration-150">
+                        <input type="checkbox"
+                               name="tags"
+                               value="{{ tag.id }}"
+                               class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <span class="material-symbols-outlined text-blue-500 text-sm">
+                            {{ tag.material_icon }}
+                        </span>
+                        <span class="text-gray-700 text-sm">{{ tag.name }}</span>
+                    </label>
+                    {% empty %}
+                    <div class="col-span-2 text-center text-gray-500 py-4">
+                        Теги не знайдено
+                    </div>
+                    {% endfor %}
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Оберіть один або декілька тегів для зображення</p>
             </div>
 
             <!-- Кнопка відправки -->
