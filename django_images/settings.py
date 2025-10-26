@@ -148,6 +148,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+FILE_CHARSET = 'utf-8'
+DEFAULT_CHARSET = 'utf-8'
+
 # Internationalization
 LANGUAGE_CODE = "en-us"
 
