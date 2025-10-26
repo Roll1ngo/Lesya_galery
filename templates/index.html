@@ -29,7 +29,7 @@
                     <div class="flex items-center space-x-2 flex-wrap">
                         {% if img.tags.all %}
                             {% for tag in img.tags.all %}
-                            <span class="material-symbols-outlined text-blue-400 text-lg" title="{{ tag.name }}">
+                            <span class="material-symbols-outlined text-blue-400 mr-2 text-sm" style="cursor: pointer" title="{{ tag.name }}">
                                 {{ tag.material_icon }}
                             </span>
                             {% endfor %}
@@ -41,34 +41,70 @@
                     <div class="flex space-x-2 flex-shrink-0">
                         {% if user.is_superuser %}
                         <!-- 🌟 КНОПКА "ТЕГИ" -->
-                        <div class="relative inline-block text-left" x-data="{ open: false }" @click.away="open = false">
+                        <div class="relative inline-block text-left" x-data="{
+                            open: false,
+                            getDropdownPosition() {
+                                if (!this.$refs.tagButton) return { left: 0, top: 0 };
+
+                                const buttonRect = this.$refs.tagButton.getBoundingClientRect();
+                                const dropdownWidth = 192; // w-48 = 48 * 4 = 192px
+                                const dropdownHeight = 240; // max-h-60 = 60 * 4 = 240px
+
+                                let left = buttonRect.left;
+                                let top = buttonRect.bottom + 2;
+
+                                // Перевіряємо, чи вилазить за праву границю екрану
+                                if (left + dropdownWidth > window.innerWidth) {
+                                    left = window.innerWidth - dropdownWidth - 10; // Відступ від краю
+                                }
+
+                                // Перевіряємо, чи вилазить за нижню границю екрану
+                                if (top + dropdownHeight > window.innerHeight) {
+                                    // Якщо вилазить - відкриваємо вгору
+                                    top = buttonRect.top - dropdownHeight - 2;
+                                }
+
+                                // Гарантуємо мінімальний відступ від лівого краю
+                                left = Math.max(10, left);
+
+                                // Гарантуємо мінімальний відступ від верху/низу
+                                top = Math.max(10, Math.min(top, window.innerHeight - dropdownHeight - 10));
+
+                                return { left: left + 'px', top: top + 'px' };
+                            }
+                        }">
                             <button @click="open = !open"
                                     title="Керування тегами"
-                                    class="fa-solid fa-window-restore text-gray-300 hover:text-blue-400 transition duration-300">
+                                    class="fa-solid fa-window-restore text-gray-300 hover:text-blue-400 transition duration-300 cursor-pointer"
+                                    x-ref="tagButton"
+                            style="cursor: pointer;">
+                                <!-- Іконка кнопки -->
                             </button>
 
                             <!-- Випадаючий список тегів -->
                             <div x-show="open"
-                                 x-transition:enter="transition ease-out duration-100"
-                                 x-transition:enter-start="transform opacity-0 scale-95"
-                                 x-transition:enter-end="transform opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-75"
-                                 x-transition:leave-start="transform opacity-100 scale-100"
-                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                 class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 divide-y divide-gray-600 z-50 origin-top-right max-h-60 overflow-y-auto">
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                                 @click.away="open = false"
+                                 class="fixed w-48 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 divide-y divide-gray-600 z-50 origin-top-right max-h-60 overflow-y-auto"
+                                 :style="getDropdownPosition()">
 
                                 <div class="py-1">
                                     {% for tag in all_tags %}
                                     {% with tag_id_str=tag.id|stringformat:"s" %}
                                     <label class="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-600 cursor-pointer transition duration-150 ease-in-out">
                                         <input type="checkbox"
-                                               class="tag-checkbox form-checkbox h-4 w-4 text-blue-600 bg-gray-800 border-gray-600 rounded mr-3 focus:ring-blue-500"
+                                               class="tag-checkbox form-checkbox h-4 w-4 text-blue-600 bg-gray-800 border-gray-600 rounded mr-3 focus:ring-blue-500 cursor-pointer"
                                                data-image-id="{{ img.id }}"
                                                data-tag-id="{{ tag.id }}"
                                                {% if tag in img.tags.all %}checked{% endif %}
                                                onchange="toggleImageTag(this)">
                                         <!-- Назва тегу з іконкою -->
-                                        <span class="material-symbols-outlined text-blue-400 mr-2 text-sm">
+                                        <span class="material-symbols-outlined text-blue-400 mr-2 text-sm cursor-help" title="{{ tag.name }}">
                                             {{ tag.material_icon }}
                                         </span>
                                         {{ tag.name }}
@@ -81,6 +117,8 @@
                             </div>
                         </div>
                         <!-- 🌟 КІНЕЦЬ БЛОКУ -->
+
+
 
                         <a href="{% url 'delete_image' img.id %}"
                            title="Видалити {{ img.title }}"

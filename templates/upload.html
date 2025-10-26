@@ -64,7 +64,13 @@
             <!-- Кнопка відправки -->
             <div>
                 <button type="submit"
-                        class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 transform hover:scale-[1.01]">
+                        class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4
+                               rounded-lg shadow-md transition-all duration-200
+                               transform hover:scale-[1.01] active:scale-[0.99] active:bg-gray-600 active:shadow-inner"
+                        style="cursor: pointer;"
+                        onmousedown="this.classList.add('!bg-gray-600', '!scale-[0.99]', '!shadow-inner')"
+                        onmouseup="this.classList.remove('!bg-gray-600', '!scale-[0.99]', '!shadow-inner')"
+                        onmouseleave="this.classList.remove('!bg-gray-600', '!scale-[0.99]', '!shadow-inner')">
                     Завантажити
                 </button>
             </div>
