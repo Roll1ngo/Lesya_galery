@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Довідка та Основні Положення</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static tailwind_tags %}
+    {% tailwind_css %}
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #181818;
+            font-family: Arial, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+
+        .content-box {
+            max-width: 700px;
+            width: 100%;
+            background-color: #2d2d2d; /* bg-gray-800 */
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Стилі для кнопки */
+        .understand-button {
+            padding: 12px 24px;
+            background-color: #3b82f6;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+            outline: none;
+        }
+
+        /* Ефект при натисканні (активний стан) */
+        .understand-button:active {
+            background-color: #1e40af;
+            transform: scale(0.98);
+            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.8);
+        }
+
+        .understand-button.redirecting {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body x-data>
+    <div class="content-box">
+        <h1 class="text-3xl font-bold text-blue-400 mb-4 text-center">Основні Положення та Довідка 💡</h1>
+        <div class="text-gray-300 space-y-4 mt-6">
+            <p>Ця сторінка містить довідкову інформацію щодо використання Галереї Ідей:</p>
+
+            <h3 class="text-xl font-semibold text-white">Керування контентом:</h3>
+            <ul class="list-disc list-inside ml-4 space-y-2">
+                <li>**Сортування:** Ви можете обрати сортування за **"Новіші"** або **"Раніше завантажені"**.</li>
+                <li>**Категорії:** Використовуйте фільтр, щоб переглянути ідеї лише певної **категорії (тегу)**.</li>
+                <li>**Іконка Довідки (❓):** Завжди виведе вас на цю сторінку.</li>
+            </ul>
+        </div>
+
+        <div class="mt-8 flex justify-center">
+            <button onclick="handleUnderstandClick('{% url 'index' %}')"
+                    id="understandBtn"
+                    class="understand-button">
+                Зрозуміло
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const HELP_VIEWED_MARKER_COOKIE = 'first_visit_done';
+        const HELP_VIEWED_LOCALSTORAGE_KEY = 'isHelpViewed';
+
+        // Виконання при натисканні на кнопку
+        function handleUnderstandClick(redirectUrl) {
+            const button = document.getElementById('understandBtn');
+
+            // 1. Анімація
+            button.classList.add('redirecting');
+
+            // 2. Кешування
+            // Встановлюємо LocalStorage
+            try {
+                localStorage.setItem(HELP_VIEWED_LOCALSTORAGE_KEY, 'true');
+            } catch (e) {
+                console.warn("Local Storage заблоковано.");
+            }
+
+            // Встановлюємо Куку (Для інформування Django про перегляд)
+            const date = new Date();
+            date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000)); // 1 рік
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = `${HELP_VIEWED_MARKER_COOKIE}=true;${expires};path=/;SameSite=Lax`;
+
+            // 3. Перенаправлення
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 500);
+        }
+
+        // 4. ПЕРЕВІРКА ПРИ ПЕРШОМУ ВІЗИТІ (Використовуємо LocalStorage як маркер)
+        // Цей код спрацює, якщо Django перенаправив на help_page.
+        // Якщо користувач вже бачив це вікно (перевірка LocalStorage), перенаправляємо його назад.
+        // (Це вирішує проблему, коли куки відключені, але LocalStorage доступний)
+
+        document.addEventListener('DOMContentLoaded', function() {
+             const urlParams = new URLSearchParams(window.location.search);
+             const isFirstVisitRedirect = urlParams.get('first') === 'true';
+
+             // === КЛЮЧОВЕ ВИПРАВЛЕННЯ ЛОГІКИ ЗАЦИКЛЕННЯ ===
+             if (isFirstVisitRedirect) {
+                 // Перевіряємо, чи користувач вже бачив допомогу (навіть якщо куки вимкнені)
+                 if (localStorage.getItem(HELP_VIEWED_LOCALSTORAGE_KEY) === 'true') {
+                     // Якщо LocalStorage встановлено, це означає, що користувач уже бачив допомогу.
+                     // Ми припускаємо, що кука була втрачена/видалена, і просто повертаємо його на головну.
+                     console.log("Допомога вже бачена (Local Storage). Перенаправлення на головну.");
+
+                     // ВАЖЛИВО: Перед перенаправленням, ми повинні спробувати знову встановити куку,
+                     // щоб наступний запит не викликав цей цикл знову.
+
+                     // 1. Встановлюємо Куку
+                     const date = new Date();
+                     date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
+                     const expires = "expires=" + date.toUTCString();
+                     document.cookie = `${HELP_VIEWED_MARKER_COOKIE}=true;${expires};path=/;SameSite=Lax`;
+
+                     // 2. Перенаправляємо
+                     window.location.href = "{% url 'index' %}";
+                 }
+                 // Якщо LocalStorage не встановлено, це справжній перший візит, і ми ЗАЛИШАЄМО його на help.html.
+             }
+        });
+    </script>
+</body>
+</html>

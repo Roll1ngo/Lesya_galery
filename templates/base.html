@@ -10,7 +10,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <!-- ВИДАЛИТИ ОДИН З СКРИПТІВ - ЗАЛИШИТИ ЛИШЕ ОДИН -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js"></script>
 
         <link rel="stylesheet"
@@ -158,6 +157,11 @@
                             {% endfor %}
                         </div>
                     </div>
+                    <a href="{% url 'help_page' %}"
+                       class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300 cursor-pointer ml-2 flex items-center justify-center"
+                       title="Довідка" style="cursor: pointer;">
+                       <span class="material-symbols-outlined text-lg">help</span>
+                    </a>
                 </div>
             </div>
 

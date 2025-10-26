@@ -3,6 +3,7 @@ import json
 import cloudinary
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from .models import Image, Tag
@@ -16,13 +17,17 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
 from django.utils import timezone
 from datetime import timedelta
-
-
+HELP_VIEWED_MARKER_COOKIE = 'first_visit_done'
 def index(request):
     # Отримуємо параметри сортування з GET-запиту
     sort_by = request.GET.get('sort', 'newest')
     category_id = request.GET.get('category', 'all')
-
+    if request.COOKIES.get(HELP_VIEWED_MARKER_COOKIE) is None:
+        print("Redirecting to help page for first visit.")
+        # Додаємо параметр 'from_first_visit' для ідентифікації
+        # Цей параметр потрібен, якщо ми хочемо обробляти кешування лише при першому візиті.
+        return redirect(reverse('help_page') + '?first=true')
+    print("Not the first visit or help already viewed.")
     # Базовий queryset
     images = Image.objects.all()
 
@@ -233,3 +238,16 @@ def toggle_tag_view(request):
         # Обробка інших можливих помилок, наприклад, помилок бази даних
         return JsonResponse({'status': 'error', 'message': f'Внутрішня помилка сервера: {str(e)}'}, status=500)
 
+
+def help_page(request):
+    """Виводить сторінку довідки."""
+
+    # Перевіряємо, чи це перехід з першого візиту
+    is_first_visit_redirect = request.GET.get('first') == 'true'
+
+    context = {
+        'is_first_visit_redirect': is_first_visit_redirect
+    }
+
+    # render(request, "help.html", context)
+    return render(request, "help.html", context)  # Припустімо, що ваш шаблон називається help.html
