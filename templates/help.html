@@ -1,13 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
-    <title>Довідка та Основні Положення</title>
+    <title>Довідка та Основні Положення (Торти)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load static tailwind_tags %}
-    {% tailwind_css %}
-
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
+        /* Стилі для Material Symbols */
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+            vertical-align: middle;
+        }
+
+        /* Загальні стилі */
         body {
             display: flex;
             flex-direction: column;
@@ -15,40 +26,47 @@
             align-items: center;
             min-height: 100vh;
             background-color: #181818;
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             color: white;
             padding: 20px;
         }
 
         .content-box {
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
             background-color: #2d2d2d; /* bg-gray-800 */
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-radius: 16px; /* Більші заокруглення */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+            border: 1px solid #3d3d3d;
         }
 
         /* Стилі для кнопки */
         .understand-button {
-            padding: 12px 24px;
-            background-color: #3b82f6;
+            padding: 12px 30px;
+            background-color: #f97316; /* Помаранчевий колір для "смачного" вигляду */
             color: white;
             font-size: 18px;
             font-weight: bold;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 6px 15px rgba(249, 115, 22, 0.5);
             outline: none;
+        }
+
+        .understand-button:hover {
+             background-color: #ea580c;
+             transform: translateY(-2px);
+             box-shadow: 0 8px 20px rgba(249, 115, 22, 0.6);
         }
 
         /* Ефект при натисканні (активний стан) */
         .understand-button:active {
-            background-color: #1e40af;
+            background-color: #c2410c;
             transform: scale(0.98);
-            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.8);
+            box-shadow: 0 2px 5px rgba(249, 115, 22, 0.8);
         }
 
         .understand-button.redirecting {
@@ -59,28 +77,97 @@
 </head>
 <body x-data>
     <div class="content-box">
-        <h1 class="text-3xl font-bold text-blue-400 mb-4 text-center">Основні Положення та Довідка 💡</h1>
-        <div class="text-gray-300 space-y-4 mt-6">
-            <p>Ця сторінка містить довідкову інформацію щодо використання Галереї Ідей:</p>
+        <h1 class="text-4xl font-extrabold text-white mb-2 text-center tracking-wider">
+            🍰 Галерея Ідей: Ваше Солодке Натхнення 💡
+        </h1>
 
-            <h3 class="text-xl font-semibold text-white">Керування контентом:</h3>
-            <ul class="list-disc list-inside ml-4 space-y-2">
-                <li>**Сортування:** Ви можете обрати сортування за **"Новіші"** або **"Раніше завантажені"**.</li>
-                <li>**Категорії:** Використовуйте фільтр, щоб переглянути ідеї лише певної **категорії (тегу)**.</li>
-                <li>**Іконка Довідки (❓):** Завжди виведе вас на цю сторінку.</li>
+        <div class="my-6">
+            <img src="{% static 'images/rabbit.jpeg'%}"
+                 alt="Декоративний кролик"
+                 class="w-full object-cover rounded-xl shadow-xl transition duration-300"
+                 style="height: 600px;"> </div>
+
+<!--        <div class="my-6">-->
+<!--            <img src="https://placehold.co/800x200/4c4c4c/ffffff?text=ВАШ+ТОРТ+ПОЧИНАЄТЬСЯ+ТУТ"-->
+<!--                 alt="Заглушка для початкового зображення торта"-->
+<!--                 class="w-full object-cover rounded-xl shadow-xl transition duration-300">-->
+<!--        </div>-->
+
+        <p class="text-xl text-center text-gray-200 mb-8 p-3 bg-gray-700 rounded-lg border-l-4 border-orange-500 italic">
+            Ознайомлення займе не більше 30 секунд, але дасть чітке розуміння, як створити ваш ідеальний торт у процесі перегляду моїх робіт!
+        </p>
+<!--        <h2 class="text-2xl font-bold text-orange-400 mb-4 mt-8">✨ Секрети Солодкого Конструктора</h2>-->
+
+        <div class="my-6">
+            <img src="https://placehold.co/800x150/6b21a8/ffffff?text=ОПЦІЇ+ТА+МАГІЧНИЙ+ДЕКОР"
+                 alt="Заглушка для зображення опцій"
+                 class="w-full object-cover rounded-xl shadow-xl transition duration-300">
+        </div>
+        <div class="text-gray-300 space-y-4">
+            <ul class="list-none ml-0 space-y-5">
+                <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-yellow-500">
+                    <span class="text-xl text-yellow-400 font-semibold mr-2">🎂 Вибір Основи (Начинки):</span>
+                    <span class="text-lg">Основу торту можете вибрати яка вам до смаку: **Наполеон, Медовик, Фруктовий (апельсин-ківі), Снікерс**. Якщо виникають труднощі з вибором, то в продажі є порціонні шматочки кожного у відділі замовлення.</span>
+                </li>
+                <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-orange-500">
+                    <span class="text-xl text-orange-400 font-semibold mr-2">🎨 Варіативність:</span>
+                    <span class="text-lg">Ви можете вільно варіювати колір, форму торта, вид квітів, напис, і навіть кількість цифр. Ми тут, щоб втілити ваші найсміливіші (і найсолодші!) ідеї.</span>
+                </li>
+                <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-orange-500">
+                    <span class="text-xl text-orange-400 font-semibold mr-2">🔄 Універсальність Декору:</span>
+                    <span class="text-lg">Усі елементи декору, які ви бачите в галереї, є універсальними та можуть бути використані на **Вашому** торті. Ми не маємо обмежень!</span>
+                </li>
+                <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-purple-500">
+                    <span class="text-xl text-purple-400 font-semibold mr-2">💫 Магічний Дотик (Окремо):</span>
+                    <span class="material-symbols-outlined text-purple-400 text-3xl font-bold">wand_stars</span>
+                    <span class="text-lg">Це позначення вказує на декор, який докуповується окремо (роздруківка на їстівному папері, фігурки з мастики, намистини тощо). Вартість обговорюється індивідуально, адже справжня магія коштує окремо!</span>
+                </li>
             </ul>
         </div>
 
-        <div class="mt-8 flex justify-center">
-            <button onclick="handleUnderstandClick('{% url 'index' %}')"
+
+        <h2 class="text-3xl font-extrabold text-indigo-400 mb-6 mt-10 tracking-wide border-b border-indigo-500 pb-2">
+    📚 Навігація Галереєю (Легкі Кроки)
+</h2>
+<div class="text-gray-300 space-y-4">
+    <ul class="list-none ml-0 space-y-5">
+        <li class="p-4 bg-gray-700 rounded-xl shadow-lg border-l-4 border-indigo-500 flex items-start">
+            <span class="material-symbols-outlined text-3xl text-indigo-400 mr-4 mt-1">sort</span>
+            <div>
+                <span class="text-xl text-indigo-400 font-semibold block mb-1">Сортування:</span>
+                <span class="text-lg">Обирайте сортування за **"Новіші"** або **"Раніше завантажені"** для зручної навігації в часі та пошуку.</span>
+            </div>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-xl shadow-lg border-l-4 border-indigo-500 flex items-start">
+            <span class="material-symbols-outlined text-3xl text-indigo-400 mr-4 mt-1">category</span>
+            <div>
+                <span class="text-xl text-indigo-400 font-semibold block mb-1">Категорії:</span>
+                <span class="text-lg">Використовуйте фільтр, щоб переглянути ідеї лише певної **категорії (тегу)**, наприклад, "Дитячі" або "Весільні".</span>
+            </div>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-xl shadow-lg border-l-4 border-indigo-500 flex items-start">
+            <span class="material-symbols-outlined text-3xl text-indigo-400 mr-4 mt-1">help</span>
+            <div>
+                <span class="text-xl text-indigo-400 font-semibold block mb-1">Іконка Довідки (❓):</span>
+                <span class="text-lg">Завжди виведе вас на цю сторінку, якщо забудете "Секрети Солодкого Конструктора" або потребуєте підказки.</span>
+            </div>
+        </li>
+    </ul>
+</div>
+
+        <div class="mt-10 flex justify-center">
+            <button onclick="handleUnderstandClick('/')"
                     id="understandBtn"
                     class="understand-button">
-                Зрозуміло
+                Зрозуміло! Перейти до Галереї 🍰
             </button>
         </div>
     </div>
 
     <script>
+        // Імітація змінних середовища/шаблонізатора (за потреби у чистому HTML)
+        const INDEX_URL = '/'; // Заглушка, якщо не використовується Django
+
         const HELP_VIEWED_MARKER_COOKIE = 'first_visit_done';
         const HELP_VIEWED_LOCALSTORAGE_KEY = 'isHelpViewed';
 
@@ -92,14 +179,13 @@
             button.classList.add('redirecting');
 
             // 2. Кешування
-            // Встановлюємо LocalStorage
             try {
                 localStorage.setItem(HELP_VIEWED_LOCALSTORAGE_KEY, 'true');
             } catch (e) {
                 console.warn("Local Storage заблоковано.");
             }
 
-            // Встановлюємо Куку (Для інформування Django про перегляд)
+            // Встановлюємо Куку (Для інформування бекенду про перегляд)
             const date = new Date();
             date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000)); // 1 рік
             const expires = "expires=" + date.toUTCString();
@@ -111,36 +197,26 @@
             }, 500);
         }
 
-        // 4. ПЕРЕВІРКА ПРИ ПЕРШОМУ ВІЗИТІ (Використовуємо LocalStorage як маркер)
-        // Цей код спрацює, якщо Django перенаправив на help_page.
-        // Якщо користувач вже бачив це вікно (перевірка LocalStorage), перенаправляємо його назад.
-        // (Це вирішує проблему, коли куки відключені, але LocalStorage доступний)
-
+        // 4. ПЕРЕВІРКА ПРИ ПЕРШОМУ ВІЗИТІ
         document.addEventListener('DOMContentLoaded', function() {
+             // Ми імітуємо перевірку параметрів URL, як це було у Django-фрагменті
              const urlParams = new URLSearchParams(window.location.search);
              const isFirstVisitRedirect = urlParams.get('first') === 'true';
 
-             // === КЛЮЧОВЕ ВИПРАВЛЕННЯ ЛОГІКИ ЗАЦИКЛЕННЯ ===
              if (isFirstVisitRedirect) {
-                 // Перевіряємо, чи користувач вже бачив допомогу (навіть якщо куки вимкнені)
                  if (localStorage.getItem(HELP_VIEWED_LOCALSTORAGE_KEY) === 'true') {
-                     // Якщо LocalStorage встановлено, це означає, що користувач уже бачив допомогу.
-                     // Ми припускаємо, що кука була втрачена/видалена, і просто повертаємо його на головну.
                      console.log("Допомога вже бачена (Local Storage). Перенаправлення на головну.");
 
-                     // ВАЖЛИВО: Перед перенаправленням, ми повинні спробувати знову встановити куку,
-                     // щоб наступний запит не викликав цей цикл знову.
-
-                     // 1. Встановлюємо Куку
+                     // Спробуємо знову встановити куку
                      const date = new Date();
                      date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
                      const expires = "expires=" + date.toUTCString();
                      document.cookie = `${HELP_VIEWED_MARKER_COOKIE}=true;${expires};path=/;SameSite=Lax`;
 
-                     // 2. Перенаправляємо
-                     window.location.href = "{% url 'index' %}";
+                     // Перенаправляємо
+                     window.location.href = INDEX_URL;
                  }
-                 // Якщо LocalStorage не встановлено, це справжній перший візит, і ми ЗАЛИШАЄМО його на help.html.
+                 // Якщо це справжній перший візит, залишаємо користувача тут.
              }
         });
     </script>

@@ -165,6 +165,10 @@ STATIC_URL = "static/"
 # !!! ВИПРАВЛЕННЯ: Це обов'язково для 'staticfiles' та 'whitenoise' !!!
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static", # <--- ADD THIS LINE
+]
+
 # --- MEDIA FILES (Зображення, завантажені користувачами) ---
 
 # 1. Cloudinary URL
