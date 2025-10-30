@@ -1,15 +1,14 @@
-from cloudinary.api import upload_preset
 from django.db import models
 from cloudinary.models import CloudinaryField
 from django.utils.text import slugify
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True, verbose_name="Назва тегу")
+    name = models.CharField(max_length=50, unique=True,
+                            verbose_name="Назва тегу")
     slug = models.SlugField(unique=True, blank=True)
     material_icon = models.CharField(
         max_length=50,
-        default='tag',
     )
 
     def save(self, *args, **kwargs):

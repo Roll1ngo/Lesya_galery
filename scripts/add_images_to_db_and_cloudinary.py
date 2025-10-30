@@ -3,6 +3,7 @@ import load_django
 from home.models import Image, Tag
 from cloudinary import uploader
 
+ALLOWED_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.webp', '.gif')
 
 def upload_local_images_to_db(folder_path, tag_name=None):
     """
@@ -12,10 +13,6 @@ def upload_local_images_to_db(folder_path, tag_name=None):
 
     print(f"Починаю сканування папки: {folder_path}")
 
-    if tag_name:
-        tag, _ = Tag.objects.get_or_create(name=tag_name)
-
-    ALLOWED_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.webp', '.gif')
     successful_uploads = 0
 
     for filename in os.listdir(folder_path):
@@ -36,13 +33,11 @@ def upload_local_images_to_db(folder_path, tag_name=None):
                 public_id = result.get('public_id')
 
                 # СТВОРЕННЯ ЗАПИСУ В БАЗІ ДАНИХ (Django ORM)
-                new_image = Image.objects.create(
+                Image.objects.create(
                     # Поле CloudinaryField зберігає Public ID
                     image=public_id
                 )
 
-                if tag_name:
-                    new_image.tags.add(tag)
 
                 successful_uploads += 1
                 print(f"✅ Успіх. Public ID: {public_id}")
