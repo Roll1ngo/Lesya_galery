@@ -1,3 +1,4 @@
+from cloudinary.api import upload_preset
 from django.db import models
 from cloudinary.models import CloudinaryField
 from django.utils.text import slugify
@@ -21,6 +22,9 @@ class Tag(models.Model):
 
 
 class Image(models.Model):
-    image = CloudinaryField('image')
+    image = CloudinaryField(
+        'image',
+        upload_preset='zlaya_zaya_upload_limit_200kb'
+    )
     tags = models.ManyToManyField(Tag, related_name='images', blank=True, verbose_name="Теги")
     uploaded_at = models.DateTimeField(auto_now=True)
