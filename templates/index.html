@@ -142,6 +142,46 @@
             {% endfor %}
         </div>
     </main>
+
+    {% if images %}
+    <div id="imageModal" class="hidden fixed inset-0 z-50">
+        <div id="modalOverlay" class="absolute inset-0 bg-black bg-opacity-85 cursor-pointer"></div>
+
+        <div id="modalContent" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                                      w-[90vw] h-[90vh] overflow-auto bg-transparent
+                                      flex justify-center items-start">
+            <img id="modalImage" src="" alt="" class="max-w-none max-h-none
+                                                     w-auto h-auto object-contain
+                                                     rounded-lg shadow-2xl
+                                                     transition-transform duration-300
+                                                     origin-top-left">
+        </div>
+
+        <button id="closeButton" onclick="closeModal()"
+                class="fixed top-5 right-5 w-12 h-12 bg-red-500 text-white
+                       border-none rounded-full text-2xl font-bold cursor-pointer
+                       flex items-center justify-center shadow-lg
+                       hover:bg-red-600 transition-colors z-50">
+            ×
+        </button>
+
+        <div id="zoomControls" class="fixed bottom-5 left-1/2 transform -translate-x-1/2
+                                     flex gap-3 z-50">
+            <button onclick="changeZoom(-0.2)"
+                    class="w-12 h-12 bg-blue-500 text-white border-none rounded-full
+                           text-xl font-bold cursor-pointer flex items-center justify-center
+                           shadow-lg hover:bg-blue-600 transition-all hover:scale-105">
+                −
+            </button>
+            <button onclick="changeZoom(0.2)"
+                    class="w-12 h-12 bg-blue-500 text-white border-none rounded-full
+                           text-xl font-bold cursor-pointer flex items-center justify-center
+                           shadow-lg hover:bg-blue-600 transition-all hover:scale-105">
+                +
+            </button>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% if images %}
 
