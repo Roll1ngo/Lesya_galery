@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %} Галерея Ідей {% endblock title %}
+
+{% block content %}
+
+<div class="bg-gray-900 pt-20 min-h-screen">
+    {% if messages %}
+    <ul class="max-w-4xl mx-auto p-4 space-y-2">
+        {% for message in messages %}
+        <li class="p-4 rounded-lg text-sm {% if message.tags == 'success' %}bg-green-800 text-green-100{% endif %} {% if message.tags == 'error' %}bg-red-800 text-red-100{% endif %} {% if message.tags == 'warning' %}bg-yellow-800 text-yellow-100{% endif %} {% if message.tags == 'info' %}bg-blue-800 text-blue-100{% endif %}">
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <main class="p-6">
+        <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+            {% for img in images %}
+            <div class="break-inside-avoid bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 relative">
+                <div class="relative">
+                  <img src="{{ img.image.url }}" alt="{{ img.title }}" class="w-full h-auto object-cover {% if is_desktop %}cursor-pointer{% endif %}"
+                    {% if is_desktop %}
+                        onclick="openModal('{{ img.image.url }}', '{{ img.title }}')"
+                    {% endif %}>
+                </div>
+                <div class="p-4 flex justify-between items-center">
+                    <!-- ЗАМІНА НАЗВИ НА ІКОНКИ КАТЕГОРІЙ -->
+                    <div class="flex items-center space-x-2 flex-wrap">
+                        {% if img.tags.all %}
+                            {% for tag in img.tags.all %}
+                            <span class="material-symbols-outlined text-blue-400 mr-2 text-sm" style="cursor: pointer" title="{{ tag.name }}">
+                                {{ tag.material_icon }}
+                            </span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-gray-500 text-sm">Без тегів</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex space-x-2 flex-shrink-0">
+                        {% if user.is_superuser %}
+                        <!-- 🌟 КНОПКА "ТЕГИ" -->
+                        <div class="relative inline-block text-left" x-data="{
+                            open: false,
+                            getDropdownPosition() {
+                                if (!this.$refs.tagButton) return { left: 0, top: 0 };
+
+                                const buttonRect = this.$refs.tagButton.getBoundingClientRect();
+                                const dropdownWidth = 192; // w-48 = 48 * 4 = 192px
+                                const dropdownHeight = 240; // max-h-60 = 60 * 4 = 240px
+
+                                let left = buttonRect.left;
+                                let top = buttonRect.bottom + 2;
+
+                                // Перевіряємо, чи вилазить за праву границю екрану
+                                if (left + dropdownWidth > window.innerWidth) {
+                                    left = window.innerWidth - dropdownWidth - 10; // Відступ від краю
+                                }
+
+                                // Перевіряємо, чи вилазить за нижню границю екрану
+                                if (top + dropdownHeight > window.innerHeight) {
+                                    // Якщо вилазить - відкриваємо вгору
+                                    top = buttonRect.top - dropdownHeight - 2;
+                                }
+
+                                // Гарантуємо мінімальний відступ від лівого краю
+                                left = Math.max(10, left);
+
+                                // Гарантуємо мінімальний відступ від верху/низу
+                                top = Math.max(10, Math.min(top, window.innerHeight - dropdownHeight - 10));
+
+                                return { left: left + 'px', top: top + 'px' };
+                            }
+                        }">
+                            <button @click="open = !open"
+                                    title="Керування тегами"
+                                    class="fa-solid fa-window-restore text-gray-300 hover:text-blue-400 transition duration-300 cursor-pointer"
+                                    x-ref="tagButton"
+                            style="cursor: pointer;">
+                                <!-- Іконка кнопки -->
+                            </button>
+
+                            <!-- Випадаючий список тегів -->
+                            <div x-show="open"
+                                 x-transition
+                                 @click.away="open = false"
+                                 class="fixed w-48 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 divide-y divide-gray-600 z-50 origin-top-right max-h-60 overflow-y-auto"
+                                 :style="getDropdownPosition()">
+
+                                <div class="py-1">
+                                    {% for tag in all_tags %}
+                                    {% with tag_id_str=tag.id|stringformat:"s" %}
+                                    <label class="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-600 cursor-pointer transition duration-150 ease-in-out">
+                                        <input type="checkbox"
+                                               class="tag-checkbox form-checkbox h-4 w-4 text-blue-600 bg-gray-800 border-gray-600 rounded mr-3 focus:ring-blue-500 cursor-pointer"
+                                               data-image-id="{{ img.id }}"
+                                               data-tag-id="{{ tag.id }}"
+                                               {% if tag in img.tags.all %}checked{% endif %}
+                                               onchange="toggleImageTag(this)">
+                                        <!-- Назва тегу з іконкою -->
+                                        <span class="material-symbols-outlined text-blue-400 mr-2 text-sm cursor-help" title="{{ tag.name }}">
+                                            {{ tag.material_icon }}
+                                        </span>
+                                        {{ tag.name }}
+                                    </label>
+                                    {% endwith %}
+                                    {% empty %}
+                                        <div class="px-4 py-2 text-sm text-gray-400">Теги не знайдено.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 🌟 КІНЕЦЬ БЛОКУ -->
+
+
+
+                        <a href="{% url 'delete_image' img.id %}"
+                           title="Видалити {{ img.title }}"
+                           class="p-1 bg-gray-700 text-gray-300 rounded-md shadow-md border border-gray-500 hover:bg-red-600 hover:text-white transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </a>
+                        {% endif %}
+                        <a href="{{ download_url }}?filename={{ img.title|slugify }}.jpg"
+                           download="{{ img.title|slugify }}.jpg"
+                           title="Завантажити {{ img.title }}"
+                           class="p-1 bg-gray-700 text-gray-300 rounded-md shadow-md border border-gray-500 hover:bg-gray-600 hover:text-blue-400 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-gray-500 text-lg">Зображень ще не завантажено.</p>
+            {% endfor %}
+        </div>
+    </main>
+
+    {% if images %}
+    <div id="imageModal" class="hidden fixed inset-0 z-50">
+        <div id="modalOverlay" class="absolute inset-0 bg-black bg-opacity-85 cursor-pointer"></div>
+
+        <div id="modalContent" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                                      w-[90vw] h-[90vh] overflow-auto bg-transparent
+                                      flex justify-center items-start">
+            <img id="modalImage" src="" alt="" class="max-w-none max-h-none
+                                                     w-auto h-auto object-contain
+                                                     rounded-lg shadow-2xl
+                                                     transition-transform duration-300
+                                                     origin-top-left">
+        </div>
+
+        <button id="closeButton" onclick="closeModal()"
+                class="fixed top-5 right-5 w-12 h-12 bg-red-500 text-white
+                       border-none rounded-full text-2xl font-bold cursor-pointer
+                       flex items-center justify-center shadow-lg
+                       hover:bg-red-600 transition-colors z-50">
+            ×
+        </button>
+
+        <div id="zoomControls" class="fixed bottom-5 left-1/2 transform -translate-x-1/2
+                                     flex gap-3 z-50">
+            <button onclick="changeZoom(-0.2)"
+                    class="w-12 h-12 bg-blue-500 text-white border-none rounded-full
+                           text-xl font-bold cursor-pointer flex items-center justify-center
+                           shadow-lg hover:bg-blue-600 transition-all hover:scale-105">
+                −
+            </button>
+            <button onclick="changeZoom(0.2)"
+                    class="w-12 h-12 bg-blue-500 text-white border-none rounded-full
+                           text-xl font-bold cursor-pointer flex items-center justify-center
+                           shadow-lg hover:bg-blue-600 transition-all hover:scale-105">
+                +
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% if images %}
+
+<style>
+#imageModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+#imageModal.hidden {
+  display: none;
+}
+
+#imageModal:not(.hidden) {
+  display: block;
+}
+
+#modalOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+}
+
+#modalContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  height: 90vh;
+  overflow: auto;
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: transparent;
+}
+
+#modalImage {
+  max-width: none;
+  max-height: none;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transform: scale(1);
+  transition: transform 0.3s ease-in-out;
+  transform-origin: 0 0;
+}
+
+#closeButton {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s;
+  z-index: 10002;
+  line-height: 1;
+}
+
+#closeButton:hover {
+  background-color: #dc2626;
+}
+
+#zoomControls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10002;
+  display: flex;
+  gap: 10px;
+}
+
+#zoomControls button {
+  width: 50px;
+  height: 50px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s, transform 0.2s;
+  line-height: 1;
+}
+
+#zoomControls button:hover {
+  background-color: #2563eb;
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#imageModal.show {
+  animation: fadeIn 0.3s ease-in-out;
+}
+</style>
+
+<script>
+// Глобальна змінна для відстеження поточного масштабу
+let currentZoom = 1.0;
+const MAX_ZOOM = 3.0;
+const MIN_ZOOM = 1.0;
+
+function changeZoom(delta) {
+  const modalImage = document.getElementById('modalImage');
+  const modalContent = document.getElementById('modalContent');
+  if (!modalImage || !modalContent) return;
+
+  let newZoom = currentZoom + delta;
+
+  if (newZoom < MIN_ZOOM) {
+    newZoom = MIN_ZOOM;
+  } else if (newZoom > MAX_ZOOM) {
+    newZoom = MAX_ZOOM;
+  }
+
+  // Застосовуємо новий масштаб
+  modalImage.style.transform = `scale(${newZoom})`;
+  currentZoom = newZoom;
+
+  // --- ЛОГІКА ПРОКРУТКИ ---
+  if (currentZoom > 1.0) {
+    // 1. Горизонтальне прокручування (по центру)
+    // Розраховуємо горизонтальне зміщення, щоб зображення було по центру
+    const scaledWidth = modalImage.offsetWidth * newZoom;
+    const scrollHorizontal = (scaledWidth - modalContent.clientWidth) / 2;
+    modalContent.scrollLeft = scrollHorizontal > 0 ? scrollHorizontal : 0;
+
+    // 2. Вертикальне прокручування
+    // Встановлюємо вертикальну прокрутку в нуль (верхній край),
+    // оскільки transform-origin: 0 0 вже зафіксував верхній край
+    modalContent.scrollTop = 0;
+
+  } else {
+    // Якщо мінімальний масштаб, скидаємо прокрутку
+    modalContent.scrollLeft = 0;
+    modalContent.scrollTop = 0;
+  }
+}
+
+function openModal(imageUrl, imageTitle) {
+  console.log("openModal викликано з URL: ", imageUrl);
+
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  const overlay = document.getElementById('modalOverlay');
+
+  // Скидаємо масштаб та прокрутку при відкритті
+  currentZoom = 1.0;
+  modalImage.style.transform = `scale(${currentZoom})`;
+  const modalContent = document.getElementById('modalContent');
+  modalContent.scrollLeft = 0;
+  modalContent.scrollTop = 0;
+
+  // Встановлюємо зображення
+  modalImage.src = imageUrl;
+  modalImage.alt = imageTitle;
+
+  // Показуємо модальне вікно
+  modal.style.display = 'block';
+  modal.classList.add('show');
+
+
+ // Блокуємо прокрутку body
+  document.body.style.overflow = 'hidden';
+
+  // Закриття при кліку на overlay
+  overlay.onclick = function() {
+    closeModal();
+  };
+
+  console.log("Модальне вікно відкрито.");
+}
+
+function closeModal() {
+  console.log("closeModal викликано.");
+
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+
+  // Ховаємо модальне вікно
+  modal.style.display = 'none';
+  modal.classList.remove('show');
+
+  // Скидаємо масштаб та прокрутку при закритті
+  modalImage.style.transform = 'scale(1)';
+  currentZoom = 1.0;
+  const modalContent = document.getElementById('modalContent');
+  modalContent.scrollLeft = 0;
+  modalContent.scrollTop = 0;
+
+
+  // Відновлюємо прокрутку body
+  document.body.style.overflow = '';
+
+  console.log("Модальне вікно закрите.");
+}
+
+// Закриття модального вікна при натисканні Escape
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    const modal = document.getElementById('imageModal');
+    if (modal.style.display === 'block') {
+      closeModal();
+    }
+  }
+});
+</script>
+{% endif %}
+<script>
+// 🌟 ФУНКЦІЯ ОБРОБКИ ПЕРЕМИКАННЯ ТЕГІВ
+function toggleImageTag(checkbox) {
+    const imageId = checkbox.dataset.imageId;
+    const tagId = checkbox.dataset.tagId;
+    const isChecked = checkbox.checked;
+
+    // 1. Створюємо об'єкт даних для відправки
+    const data = {
+        image_id: imageId,
+        tag_id: tagId,
+        action: isChecked ? 'add' : 'remove',
+        // Django вимагає CSRF токен для POST/PUT/DELETE запитів
+        csrfmiddlewaretoken: getCookie('csrftoken')
+    };
+
+    // 2. Визначаємо URL обробки.
+    // ВИ ПОВИННІ СТВОРИТИ ЦЕЙ URL ВАШОМУ urls.py!
+    const url = '/api/toggle-tag/';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': data.csrfmiddlewaretoken
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Якщо сервер повернув помилку (наприклад, 403 Forbidden)
+            throw new Error('Server error: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(result => {
+        console.log('Success:', result);
+
+        // Оскільки ми не оновлюємо DOM динамічно,
+        // найкраще рішення — це перезавантажити сторінку, щоб відобразити нові теги
+        // window.location.reload();
+    })
+    .catch(error => {
+        console.error('Error toggling tag:', error);
+        // Відкат стану чекбоксу у випадку помилки
+        checkbox.checked = !isChecked;
+
+        // Виведення повідомлення про помилку користувачу
+        alert('Помилка під час оновлення тегу: ' + error.message);
+    });
+}
+
+// Допоміжна функція для отримання CSRF токена з кукі
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+
+{% endblock content %}

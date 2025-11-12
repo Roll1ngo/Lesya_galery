@@ -26,4 +26,5 @@ class Image(models.Model):
         upload_preset='zlaya_zaya_upload_limit_200kb'
     )
     tags = models.ManyToManyField(Tag, related_name='images', blank=True, verbose_name="Теги")
+    next_todo = models.BooleanField(default=False, verbose_name="Зроблю наступними")
     uploaded_at = models.DateTimeField(auto_now=True)

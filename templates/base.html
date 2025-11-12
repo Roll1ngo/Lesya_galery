@@ -47,11 +47,68 @@
           'GRAD' 0,
           'opsz' 24
         }
+
+        /* Курсор пальця для іконки меню */
+        .menu-icon {
+            cursor: pointer;
+        }
+
+        /* Фікс для випадаючих меню */
+        .dropdown-container {
+            position: static !important;
+        }
+        .dropdown-menu {
+            position: absolute;
+            z-index: 10000;
+        }
     </style>
     <body class="bg-gray-900 text-white pt-16 min-h-screen">
         <nav class="flex items-center justify-between p-4 bg-gray-800 fixed top-0 left-0 w-full z-50 shadow-sm">
             <!-- Логотип та сортування -->
             <div class="flex items-center space-x-4">
+              <div class="relative dropdown-container" x-data="{ open: false }">
+                <button @click="open = !open"
+                        @click.outside="open = false"
+                        class="p-2 rounded-lg hover:bg-gray-700 transition duration-300 menu-icon"
+                        title="Меню">
+                    <span class="material-symbols-outlined">
+                        dehaze
+                    </span>
+                </button>
+
+                <div x-show="open"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="dropdown-menu left-0 mt-3 w-48 bg-gray-800 rounded-lg shadow-2xl border border-gray-700 overflow-hidden"
+                     style="z-index: 10001;">
+
+                     <div class="py-1">
+                        <a href="{% url 'next_todo' %}"
+                           class="block px-4 py-3 text-sm text-gray-300 hover:bg-green-800 hover:text-white transition duration-200 flex items-center">
+                            <span class="material-symbols-outlined mr-2 text-lg">auto_fix_high</span>
+                            Зроблю наступними
+                        </a>
+                     </div>
+                    <div class="py-1">
+                        <a href="{% url 'index' %}"
+                           class="block px-4 py-3 text-sm text-gray-300 hover:bg-green-800 hover:text-white transition duration-200 flex items-center">
+                            <span class="material-symbols-outlined mr-2 text-lg">auto_fix_high</span>
+                            Заглушка
+                        </a>
+                     </div>
+                    <div class="py-1">
+                        <a href="{% url 'index' %}"
+                           class="block px-4 py-3 text-sm text-gray-300 hover:bg-green-800 hover:text-white transition duration-200 flex items-center">
+                            <span class="material-symbols-outlined mr-2 text-lg">auto_fix_high</span>
+                            Заглушка
+                        </a>
+                     </div>
+                </div>
+              </div>
                 <!-- Logo -->
                 <a href="{% url 'index' %}">
                     <div class="flex items-center space-x-2">
@@ -94,22 +151,22 @@
                 }">
 
                     <!-- Сортування за категоріями -->
-                    <div class="relative" x-data="{ open: false }">
+                    <div class="relative dropdown-container" x-data="{ open: false }">
                         <button @click="open = !open"
                                 class="flex items-center space-x-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300 cursor-pointer">
                             <!-- ІКОНКА КАТЕГОРІЇ -->
                             <span class="material-symbols-outlined text-lg" x-text="getCategoryIcon()"></span>
                             <!-- НАЗВА КАТЕГОРІЇ -->
-                            <span x-text="getCategoryName()"></span>
-                            <i class="fas fa-chevron-down text-xs"></i>
+                            <span style="cursor: pointer;" x-text="getCategoryName()"></span>
+                            <i class="fas fa-chevron-down text-xs" style="cursor: pointer;"></i>
                         </button>
 
-                        <!-- Випадаючий список - винесений за межі потоку документа -->
+                        <!-- Випадаючий список -->
                         <div x-show="open"
                              x-transition
                              @click.away="open = false"
-                             class="fixed mt-2 w-56 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 max-h-80 overflow-y-auto"
-                             :style="'left: ' + $el.parentNode.getBoundingClientRect().left + 'px; top: ' + ($el.parentNode.getBoundingClientRect().bottom + 2) + 'px;'">
+                             class="dropdown-menu mt-2 w-56 bg-gray-800 rounded-lg shadow-xl border border-gray-700 max-h-80 overflow-y-auto"
+                             style="z-index: 10001;">
                             <a href="?sort={{ request.GET.sort }}&category=all"
                                class="block px-4 py-3 hover:bg-gray-700 transition duration-200 flex items-center"
                                :class="category === 'all' ? 'sort-active text-white' : 'text-gray-300'">

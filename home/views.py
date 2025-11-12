@@ -31,18 +31,13 @@ def index(request):
         return redirect(reverse('help_page') + '?first=true')
     print("Not the first visit or help already viewed.")
     # Базовий queryset
-    images = Image.objects.all()
+    images = Image.objects.filter(next_todo=False)
 
     # СОРТУВАННЯ
     if sort_by == 'newest':
         images = images.order_by('-uploaded_at')
     elif sort_by == 'oldest':
         images = images.order_by('uploaded_at')
-
-    elif sort_by == 'trending':
-        # Трендові (за останній тиждень)
-        week_ago = timezone.now() - timedelta(days=7)
-        images = images.filter(uploaded_at__gte=week_ago).order_by('-id')
 
     # ФІЛЬТРАЦІЯ ПО КАТЕГОРІЯХ (ТЕГАХ)
     if category_id != 'all':
@@ -111,10 +106,11 @@ def upload(request):
         if checked_image_file is image_file:
             image_file.seek(0)
         selected_tags = request.POST.getlist("tags")  # Отримуємо список вибраних тегів
+        next_todo_bool = True if request.POST.get("next_todo") == "on" else False
 
         if image_file:
-            # Створюємо зображення без назви
-            image = Image.objects.create(image=checked_image_file)
+            image = Image.objects.create(image=checked_image_file,
+                                         next_todo=next_todo_bool)
 
             # Додаємо вибрані теги
             if selected_tags:
@@ -282,3 +278,34 @@ def resmush_service_quality_reduction(image):
     except json.JSONDecodeError:
         print(f"❌ Помилка: Не вдалося розібрати JSON-відповідь. Відповідь: {response.text[:100]}...")
 
+def next_todo(request):
+    sort_by = request.GET.get('sort', 'newest')
+
+    # Отримуємо параметри сортування з GET-запиту
+    category_id = request.GET.get('category', 'all')
+    # Базовий queryset
+    images = Image.objects.filter(next_todo=True)
+
+    # ФІЛЬТРАЦІЯ ПО КАТЕГОРІЯХ (ТЕГАХ)
+    if category_id != 'all':
+        try:
+            images = images.filter(tags__id=category_id).distinct()
+        except ValueError:
+            # Якщо category_id не число (наприклад, 'all')
+            pass
+
+    tags = Tag.objects.all()
+
+    user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+    is_mobile = any(
+        keyword in user_agent for keyword in ['android', 'iphone', 'ipad', 'ipod', 'mobile', 'windows phone'])
+    is_desktop = not is_mobile
+
+    context = {
+        "images": images,
+        'is_desktop': is_desktop,
+        'all_tags': tags,
+        'current_sort': sort_by,
+        'current_category': category_id,
+    }
+    return render(request, "next_todo.html", context=context)

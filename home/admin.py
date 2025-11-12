@@ -4,7 +4,7 @@ from .models import *
 
 # Register your models here.
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ["image", "uploaded_at"]
+    list_display = ["image", "next_todo", "uploaded_at"]
 
 
 admin.site.register(Image, ImageAdmin)
