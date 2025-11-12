@@ -133,7 +133,7 @@ def logout_page(request):
     return redirect("index")
 
 @login_required
-def delete_image(request, image_id):
+def delete_image(request, image_id, backref):
     # Отримуємо об'єкт, або повертаємо 404
     image_instance = get_object_or_404(Image, id=image_id)
 
@@ -160,12 +160,12 @@ def delete_image(request, image_id):
         else:
             # Обробка помилки Cloudinary (наприклад, якщо Public ID не знайдено)
             messages.warning(request, f"Зображення видалено з бази даних, але виникла помилка при видаленні з Cloudinary: {response.get('result')}")
-            image_instance.delete() # Якщо Cloudinary видалив, але результат не 'ok', краще видалити і з бази
+            image_instance.delete()  # Якщо Cloudinary видалив, але результат не 'ok', краще видалити і з бази
 
     except Exception as e:
         messages.error(request, f"Виникла непередбачена помилка: {e}")
 
-    return redirect('index')
+    return redirect('index') if backref == 'index' else redirect('next_todo')
 
 
 def download_image(request, image_id):

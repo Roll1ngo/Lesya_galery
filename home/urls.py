@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path('delete/<int:image_id>/', views.delete_image, name='delete_image'),
+    path('delete/<int:image_id>/<str:backref>/', views.delete_image, name='delete_image'),
     path('download/<int:image_id>/', views.download_image, name='download_image'),
     path('next_todo/', views.next_todo, name='next_todo'),
     path('api/toggle-tag/', views.toggle_tag_view, name='toggle_tag'),
