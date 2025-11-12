@@ -77,15 +77,13 @@
 </head>
 <body x-data>
     <div class="content-box">
-        <h1 class="text-4xl font-extrabold text-white mb-2 text-center tracking-wider">
-            🍰 Галерея Ідей: Ваше Солодке Натхнення 💡
-        </h1>
+        <h1 class="text-4xl font-extrabold text-white mb-2 text-center tracking-wider">🍰 Галерея Ідей: Обережно, тут надто солодко! ⚠️</h1>
 
-        <div class="my-6">
-            <img src="{% static 'images/rabbit.jpeg'%}"
+        <div class="my-6 w-1/2 mx-auto">
+            <img src="{% static 'images/rabbit.png'%}"
                  alt="Декоративний кролик"
-                 class="w-full object-cover rounded-xl shadow-xl transition duration-300"
-                 style="height: 600px;"> </div>
+                 class="rounded-xl shadow-xl transition duration-300">
+        </div>
 
 <!--        <div class="my-6">-->
 <!--            <img src="https://placehold.co/800x200/4c4c4c/ffffff?text=ВАШ+ТОРТ+ПОЧИНАЄТЬСЯ+ТУТ"-->
@@ -94,7 +92,7 @@
 <!--        </div>-->
 
         <p class="text-xl text-center text-gray-200 mb-8 p-3 bg-gray-700 rounded-lg border-l-4 border-orange-500 italic">
-            Ознайомлення займе не більше 30 секунд, але дасть чітке розуміння, як створити ваш ідеальний торт у процесі перегляду моїх робіт!
+            Значить так: читай інструкцію уважно, бо зроблю як сама собі придумала!!!
         </p>
 <!--        <h2 class="text-2xl font-bold text-orange-400 mb-4 mt-8">✨ Секрети Солодкого Конструктора</h2>-->
 
@@ -105,51 +103,69 @@
         </div>
         <div class="text-gray-300 space-y-4">
             <ul class="list-none ml-0 space-y-5">
-                <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-yellow-500">
-                    <span class="text-xl text-yellow-400 font-semibold mr-2">🎂 Вибір Основи (Начинки):</span>
-                    <span class="text-lg">Основу торту можете вибрати яка вам до смаку: **Наполеон, Медовик, Фруктовий (апельсин-ківі), Снікерс**. Якщо виникають труднощі з вибором, то в продажі є порціонні шматочки кожного у відділі замовлення.</span>
+                <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-orange-400">
+                    <span class="text-xl text-orange-400 font-semibold mr-2">🎂 Вибір Основи (Начинки):</span>
+                    <span class="text-lg">Основу торту можеш вибрати яка тобі до смаку з нашого асортименту.
+                        <span class="font-extrabold text-orange-400">
+                            Майте на увазі: для 3D-тортів (машини, їжачки, котли, бочки) не підійдуть: cметанник, ніжний, прага !!!
+                        </span>
+                    </span>
                 </li>
                 <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-orange-500">
                     <span class="text-xl text-orange-400 font-semibold mr-2">🎨 Варіативність:</span>
-                    <span class="text-lg">Ви можете вільно варіювати колір, форму торта, вид квітів, напис, і навіть кількість цифр. Ми тут, щоб втілити ваші найсміливіші (і найсолодші!) ідеї.</span>
+                    <span class="text-lg">Ти можеш вільно варіювати колір, форму торта, вид квітів, напис, цифри та малюнок. Ти тут, щоб я зрозуміла що ти хочеш.</span>
                 </li>
                 <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-orange-500">
                     <span class="text-xl text-orange-400 font-semibold mr-2">🔄 Універсальність Декору:</span>
-                    <span class="text-lg">Усі елементи декору, які ви бачите в галереї, є універсальними та можуть бути використані на **Вашому** торті. Ми не маємо обмежень!</span>
+                    <span class="text-lg">Більшість елементів декору, які присутні в галереї, є універсальними та можуть бути використані на твоєму торті. Зауваж, колір та його відтінок на фото можуть відрізнятися від реального(камера телефону не вловлює всі відтінки).</span>
                 </li>
                 <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-purple-500">
                     <span class="text-xl text-purple-400 font-semibold mr-2">💫 Магічний Дотик (Окремо):</span>
                     <span class="material-symbols-outlined text-purple-400 text-3xl font-bold">wand_stars</span>
-                    <span class="text-lg">Це позначення вказує на декор, який докуповується окремо (роздруківка на їстівному папері, фігурки з мастики, намистини тощо). Вартість обговорюється індивідуально, адже справжня магія коштує окремо!</span>
+                    <span class="text-lg">Це позначення вказує на декор, який докуповується окремо (роздруківка на їстівному папері, фігурки з мастики, намистини тощо). Вартість обговорюється індивідуально, бо справжня магія потребує особливих інгредієнтів і не може коштувати "стандартно"!!!</span>
+                </li>
+                <li class="p-3 bg-gray-700 rounded-lg shadow-md border-l-4 border-orange-500 flex items-start">
+                    <span class="material-symbols-outlined text-3xl text-orange-400 mr-3 mt-1">schedule</span>
+                    <div>
+                        <span class="text-xl text-orange-400 font-semibold block mb-1">⏰ Терміни та твої побажання:</span>
+                        <span class="text-lg">Замовлення приймаються щонайменше за 10 днів! Без фото та чіткого опису я не починаю роботу, або зроблю як сама собі придумала!!!</span>
+                    </div>
                 </li>
             </ul>
         </div>
 
 
         <h2 class="text-3xl font-extrabold text-indigo-400 mb-6 mt-10 tracking-wide border-b border-indigo-500 pb-2">
-    📚 Навігація Галереєю (Легкі Кроки)
+    📚 Навігація Галереєю
 </h2>
 <div class="text-gray-300 space-y-4">
     <ul class="list-none ml-0 space-y-5">
         <li class="p-4 bg-gray-700 rounded-xl shadow-lg border-l-4 border-indigo-500 flex items-start">
-            <span class="material-symbols-outlined text-3xl text-indigo-400 mr-4 mt-1">sort</span>
+            <div class="my-6 w-full mx-auto">
+                <img src="{% static 'images/navigation_help.jpg'%}"
+                     alt="Декоративний кролик"
+                     class="rounded-xl shadow-xl transition duration-300">
+            </div>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-xl shadow-lg border-l-4 border-indigo-500 flex items-start">
+            <span class="material-symbols-outlined text-3xl text-indigo-400 mr-4 mt-1">download</span>
             <div>
-                <span class="text-xl text-indigo-400 font-semibold block mb-1">Сортування:</span>
-                <span class="text-lg">Обирайте сортування за **"Новіші"** або **"Раніше завантажені"** для зручної навігації в часі та пошуку.</span>
+                <span class="text-xl text-indigo-400 font-semibold block mb-1">Завантажити</span>
+                <span class="text-lg">Завантажить обране фото на телефон або комп'ютер</span>
             </div>
         </li>
         <li class="p-4 bg-gray-700 rounded-xl shadow-lg border-l-4 border-indigo-500 flex items-start">
             <span class="material-symbols-outlined text-3xl text-indigo-400 mr-4 mt-1">category</span>
             <div>
                 <span class="text-xl text-indigo-400 font-semibold block mb-1">Категорії:</span>
-                <span class="text-lg">Використовуйте фільтр, щоб переглянути ідеї лише певної **категорії (тегу)**, наприклад, "Дитячі" або "Весільні".</span>
+                <span class="text-lg">Використовуй фільтр, щоб переглянути ідеї лише певної категорії (тегу), наприклад: "Дитячі", "Квіти", "Трендові".</span>
             </div>
         </li>
         <li class="p-4 bg-gray-700 rounded-xl shadow-lg border-l-4 border-indigo-500 flex items-start">
             <span class="material-symbols-outlined text-3xl text-indigo-400 mr-4 mt-1">help</span>
             <div>
-                <span class="text-xl text-indigo-400 font-semibold block mb-1">Іконка Довідки (❓):</span>
-                <span class="text-lg">Завжди виведе вас на цю сторінку, якщо забудете "Секрети Солодкого Конструктора" або потребуєте підказки.</span>
+                <span class="text-xl text-indigo-400 font-semibold block mb-1">Іконка Довідки <span class="material-symbols-outlined text-lg" style="font-size: 28px !important;">help </span>:</span>
+                <span class="text-lg">Завжди приведе тебе на цю сторінку, коли виникнуть питання.</span>
             </div>
         </li>
     </ul>
