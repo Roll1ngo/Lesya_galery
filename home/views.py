@@ -1,23 +1,25 @@
 import json
+from datetime import timedelta
+from io import BytesIO
 
 import cloudinary
+import requests
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
-
-from .models import Image, Tag
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-
-
-# Create your views here.
-from django.db.models import Count
 from django.utils import timezone
-from datetime import timedelta
+
+from .models import Image, Tag
+
 HELP_VIEWED_MARKER_COOKIE = 'first_visit_done'
+
 def index(request):
     # Отримуємо параметри сортування з GET-запиту
     sort_by = request.GET.get('sort', 'newest')
@@ -104,11 +106,15 @@ def upload(request):
     if request.method == "POST":
         print("uploading...")
         image_file = request.FILES.get("image")
+        checked_image_file = resmush_service_quality_reduction(image_file) if image_file.size > 1 * 1024 * 1024 else image_file
+        checked_image_file = image_file if checked_image_file is None else checked_image_file
+        if checked_image_file is image_file:
+            image_file.seek(0)
         selected_tags = request.POST.getlist("tags")  # Отримуємо список вибраних тегів
 
         if image_file:
             # Створюємо зображення без назви
-            image = Image.objects.create(image=image_file)
+            image = Image.objects.create(image=checked_image_file)
 
             # Додаємо вибрані теги
             if selected_tags:
@@ -251,3 +257,28 @@ def help_page(request):
 
     # render(request, "help.html", context)
     return render(request, "help.html", context)  # Припустімо, що ваш шаблон називається help.html
+
+
+def resmush_service_quality_reduction(image):
+    api_url= "http://api.resmush.it/?qlty=20"
+    try:
+        response = requests.post(api_url, files={"files": image})
+        if response.status_code == 200:
+            response_data = response.json()
+            reduced_image_url = response_data.get("dest")
+            reduced_image_bytes = requests.get(reduced_image_url).content
+            print(f"✅ Зображення успішно зменшено через Resmush.it")
+            print(f"Original size: {image.size} bytes, Reduced size: {len(reduced_image_bytes)} bytes")
+            return InMemoryUploadedFile(
+                        file=BytesIO(reduced_image_bytes),
+                        field_name='image',
+                        name=f"reduced_{image.name}",
+                        content_type=image.content_type,
+                        size=len(reduced_image_bytes),
+                        charset=None
+                    )
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Помилка при зверненні до API: {e}")
+    except json.JSONDecodeError:
+        print(f"❌ Помилка: Не вдалося розібрати JSON-відповідь. Відповідь: {response.text[:100]}...")
+
