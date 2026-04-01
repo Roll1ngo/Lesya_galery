@@ -22,7 +22,10 @@
             {% for img in images %}
             <div class="break-inside-avoid bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 relative">
                 <div class="relative">
-                    <img src="{{ img.image.url }}" alt="{{ img.title }}" class="w-full h-auto object-cover cursor-pointer" onclick="openModal('{{ img.image.url }}', '{{ img.title }}')">
+                  <img src="{{ img.image.url }}" alt="{{ img.title }}" class="w-full h-auto object-cover {% if is_desktop %}cursor-pointer{% endif %}" 
+                    {% if is_desktop %}
+                        onclick="openModal('{{ img.image.url }}', '{{ img.title }}')"
+                    {% endif %}>
                 </div>
                 <div class="p-4 flex justify-between items-center">
                     <!-- ЗАМІНА НАЗВИ НА ІКОНКИ КАТЕГОРІЙ -->

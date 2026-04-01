@@ -19,7 +19,7 @@ def run_gunicorn():
     command = [
         'gunicorn',
         'django_images.wsgi:application',
-        '--bind', '0.0.0.0:8000',
+        '--bind', '0.0.0.0:8002',
         '--workers', '4',
         '--timeout', '60',
         '--worker-class', 'gevent'
