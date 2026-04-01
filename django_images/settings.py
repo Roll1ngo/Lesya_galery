@@ -148,6 +148,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+FILE_CHARSET = 'utf-8'
+DEFAULT_CHARSET = 'utf-8'
+
 # Internationalization
 LANGUAGE_CODE = "en-us"
 
@@ -161,6 +164,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 # !!! ВИПРАВЛЕННЯ: Це обов'язково для 'staticfiles' та 'whitenoise' !!!
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static", # <--- ADD THIS LINE
+]
 
 # --- MEDIA FILES (Зображення, завантажені користувачами) ---
 
