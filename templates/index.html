@@ -195,6 +195,14 @@
   z-index: 9999;
 }
 
+#imageModal.hidden {
+  display: none;
+}
+
+#imageModal:not(.hidden) {
+  display: block;
+}
+
 #modalOverlay {
   position: absolute;
   top: 0;
@@ -210,44 +218,29 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
   width: 90vw;
   height: 90vh;
-
-  /* ДОЗВОЛЯЄМО ПРОКРУТКУ */
   overflow: auto;
-
   z-index: 10000;
-
   display: flex;
   justify-content: center;
-  /* Вміст починається зверху */
   align-items: flex-start;
-
   background-color: transparent;
 }
 
-/* ОНОВЛЕНИЙ БЛОК ДЛЯ #modalImage */
 #modalImage {
   max-width: none;
   max-height: none;
-
   width: auto;
   height: auto;
   object-fit: contain;
-
   border-radius: 8px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-
   transform: scale(1);
   transition: transform 0.3s ease-in-out;
-
-  /* !!! КЛЮЧОВА ЗМІНА: Масштабування від верхнього лівого кута !!! */
   transform-origin: 0 0;
 }
-/* КІНЕЦЬ ОНОВЛЕНОГО БЛОКУ */
 
-/* ОНОВЛЕНІ СТИЛІ ДЛЯ КНОПКИ ЗАКРИТТЯ */
 #closeButton {
   position: fixed;
   top: 20px;
@@ -274,7 +267,6 @@
   background-color: #dc2626;
 }
 
-/* ОНОВЛЕНІ СТИЛІ ДЛЯ КНОПОК ЗУМУ */
 #zoomControls {
   position: fixed;
   bottom: 20px;
@@ -288,7 +280,7 @@
 #zoomControls button {
   width: 50px;
   height: 50px;
-  background-color: #3b82f6; /* Blue-500 */
+  background-color: #3b82f6;
   color: white;
   border: none;
   border-radius: 50%;
@@ -304,23 +296,17 @@
 }
 
 #zoomControls button:hover {
-  background-color: #2563eb; /* Blue-600 */
+  background-color: #2563eb;
   transform: scale(1.05);
 }
 
-
-/* Анімація появи */
-#imageModal.show {
-  animation: fadeIn 0.3s ease-in-out;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+#imageModal.show {
+  animation: fadeIn 0.3s ease-in-out;
 }
 </style>
 
