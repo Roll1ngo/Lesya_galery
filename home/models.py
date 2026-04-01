@@ -4,11 +4,11 @@ from django.utils.text import slugify
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True, verbose_name="Назва тегу")
+    name = models.CharField(max_length=50, unique=True,
+                            verbose_name="Назва тегу")
     slug = models.SlugField(unique=True, blank=True)
     material_icon = models.CharField(
         max_length=50,
-        default='tag',
     )
 
     def save(self, *args, **kwargs):
@@ -21,6 +21,9 @@ class Tag(models.Model):
 
 
 class Image(models.Model):
-    image = CloudinaryField('image')
+    image = CloudinaryField(
+        'image',
+        upload_preset='zlaya_zaya_upload_limit_200kb'
+    )
     tags = models.ManyToManyField(Tag, related_name='images', blank=True, verbose_name="Теги")
     uploaded_at = models.DateTimeField(auto_now=True)

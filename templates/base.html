@@ -10,7 +10,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <!-- ВИДАЛИТИ ОДИН З СКРИПТІВ - ЗАЛИШИТИ ЛИШЕ ОДИН -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js"></script>
 
         <link rel="stylesheet"
@@ -93,37 +92,6 @@
                         return 'Сортування';
                     }
                 }">
-                    <!-- Сортування за часом -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open"
-                                class="flex items-center space-x-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300 cursor-pointer">
-                            <!-- ІКОНКА СОРТУВАННЯ -->
-                            <span class="material-symbols-outlined text-lg" x-text="getSortIcon()"></span>
-                            <!-- НАЗВА СОРТУВАННЯ -->
-                            <span x-text="getSortName()"></span>
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </button>
-
-                        <!-- Випадаючий список - винесений за межі потоку документа -->
-                        <div x-show="open"
-                             x-transition
-                             @click.away="open = false"
-                             class="fixed mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50"
-                             :style="'left: ' + $el.parentNode.getBoundingClientRect().left + 'px; top: ' + ($el.parentNode.getBoundingClientRect().bottom + 2) + 'px;'">
-                            <a href="?sort=newest&category={{ request.GET.category }}"
-                               class="block px-4 py-3 hover:bg-gray-700 transition duration-200 flex items-center"
-                               :class="sortBy === 'newest' ? 'sort-active text-white' : 'text-gray-300'">
-                                <span class="material-symbols-outlined mr-2">schedule</span>
-                                Новіші
-                            </a>
-                            <a href="?sort=oldest&category={{ request.GET.category }}"
-                               class="block px-4 py-3 hover:bg-gray-700 transition duration-200 flex items-center"
-                               :class="sortBy === 'oldest' ? 'sort-active text-white' : 'text-gray-300'">
-                                <span class="material-symbols-outlined mr-2">history</span>
-                                Раніше завантажені
-                            </a>
-                        </div>
-                    </div>
 
                     <!-- Сортування за категоріями -->
                     <div class="relative" x-data="{ open: false }">
@@ -158,6 +126,11 @@
                             {% endfor %}
                         </div>
                     </div>
+                    <a href="{% url 'help_page' %}"
+                       class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300 cursor-pointer ml-2 flex items-center justify-center"
+                       title="Довідка" style="cursor: pointer;">
+                       <span class="material-symbols-outlined text-lg">help</span>
+                    </a>
                 </div>
             </div>
 

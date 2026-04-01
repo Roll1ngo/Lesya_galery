@@ -22,7 +22,10 @@
             {% for img in images %}
             <div class="break-inside-avoid bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 relative">
                 <div class="relative">
-                    <img src="{{ img.image.url }}" alt="{{ img.title }}" class="w-full h-auto object-cover cursor-pointer" onclick="openModal('{{ img.image.url }}', '{{ img.title }}')">
+                  <img src="{{ img.image.url }}" alt="{{ img.title }}" class="w-full h-auto object-cover {% if is_desktop %}cursor-pointer{% endif %}" 
+                    {% if is_desktop %}
+                        onclick="openModal('{{ img.image.url }}', '{{ img.title }}')"
+                    {% endif %}>
                 </div>
                 <div class="p-4 flex justify-between items-center">
                     <!-- ЗАМІНА НАЗВИ НА ІКОНКИ КАТЕГОРІЙ -->
@@ -142,6 +145,46 @@
             {% endfor %}
         </div>
     </main>
+
+    {% if images %}
+    <div id="imageModal" class="hidden fixed inset-0 z-50">
+        <div id="modalOverlay" class="absolute inset-0 bg-black bg-opacity-85 cursor-pointer"></div>
+
+        <div id="modalContent" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                                      w-[90vw] h-[90vh] overflow-auto bg-transparent
+                                      flex justify-center items-start">
+            <img id="modalImage" src="" alt="" class="max-w-none max-h-none
+                                                     w-auto h-auto object-contain
+                                                     rounded-lg shadow-2xl
+                                                     transition-transform duration-300
+                                                     origin-top-left">
+        </div>
+
+        <button id="closeButton" onclick="closeModal()"
+                class="fixed top-5 right-5 w-12 h-12 bg-red-500 text-white
+                       border-none rounded-full text-2xl font-bold cursor-pointer
+                       flex items-center justify-center shadow-lg
+                       hover:bg-red-600 transition-colors z-50">
+            ×
+        </button>
+
+        <div id="zoomControls" class="fixed bottom-5 left-1/2 transform -translate-x-1/2
+                                     flex gap-3 z-50">
+            <button onclick="changeZoom(-0.2)"
+                    class="w-12 h-12 bg-blue-500 text-white border-none rounded-full
+                           text-xl font-bold cursor-pointer flex items-center justify-center
+                           shadow-lg hover:bg-blue-600 transition-all hover:scale-105">
+                −
+            </button>
+            <button onclick="changeZoom(0.2)"
+                    class="w-12 h-12 bg-blue-500 text-white border-none rounded-full
+                           text-xl font-bold cursor-pointer flex items-center justify-center
+                           shadow-lg hover:bg-blue-600 transition-all hover:scale-105">
+                +
+            </button>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% if images %}
 
@@ -153,6 +196,14 @@
   width: 100%;
   height: 100%;
   z-index: 9999;
+}
+
+#imageModal.hidden {
+  display: none;
+}
+
+#imageModal:not(.hidden) {
+  display: block;
 }
 
 #modalOverlay {
@@ -170,44 +221,29 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
   width: 90vw;
   height: 90vh;
-
-  /* ДОЗВОЛЯЄМО ПРОКРУТКУ */
   overflow: auto;
-
   z-index: 10000;
-
   display: flex;
   justify-content: center;
-  /* Вміст починається зверху */
   align-items: flex-start;
-
   background-color: transparent;
 }
 
-/* ОНОВЛЕНИЙ БЛОК ДЛЯ #modalImage */
 #modalImage {
   max-width: none;
   max-height: none;
-
   width: auto;
   height: auto;
   object-fit: contain;
-
   border-radius: 8px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-
   transform: scale(1);
   transition: transform 0.3s ease-in-out;
-
-  /* !!! КЛЮЧОВА ЗМІНА: Масштабування від верхнього лівого кута !!! */
   transform-origin: 0 0;
 }
-/* КІНЕЦЬ ОНОВЛЕНОГО БЛОКУ */
 
-/* ОНОВЛЕНІ СТИЛІ ДЛЯ КНОПКИ ЗАКРИТТЯ */
 #closeButton {
   position: fixed;
   top: 20px;
@@ -234,7 +270,6 @@
   background-color: #dc2626;
 }
 
-/* ОНОВЛЕНІ СТИЛІ ДЛЯ КНОПОК ЗУМУ */
 #zoomControls {
   position: fixed;
   bottom: 20px;
@@ -248,7 +283,7 @@
 #zoomControls button {
   width: 50px;
   height: 50px;
-  background-color: #3b82f6; /* Blue-500 */
+  background-color: #3b82f6;
   color: white;
   border: none;
   border-radius: 50%;
@@ -264,23 +299,17 @@
 }
 
 #zoomControls button:hover {
-  background-color: #2563eb; /* Blue-600 */
+  background-color: #2563eb;
   transform: scale(1.05);
 }
 
-
-/* Анімація появи */
-#imageModal.show {
-  animation: fadeIn 0.3s ease-in-out;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+#imageModal.show {
+  animation: fadeIn 0.3s ease-in-out;
 }
 </style>
 
